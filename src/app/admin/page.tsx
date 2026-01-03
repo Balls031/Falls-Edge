@@ -153,14 +153,15 @@ export default function AdminPage() {
 
             if (!res.ok) {
                 const errorData = await res.json();
-                throw new Error(errorData.error || errorData.details || 'Failed to save');
+                throw new Error(errorData.details || errorData.error || 'Failed to save');
             }
 
             fetchRealtors();
             resetRealtorForm();
             alert('Realtor Saved');
-        } catch (e) {
-            alert('Error saving realtor: ' + e);
+        } catch (e: any) {
+            console.error(e);
+            alert(`Error saving realtor: ${e.message || e}`);
         } finally {
             setLoading(false);
         }
