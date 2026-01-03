@@ -3,7 +3,7 @@ import { Phone } from 'lucide-react';
 
 export default function StickyNote() {
     return (
-        <div className="fixed bottom-10 right-6 md:right-10 z-[60] rotate-3 hover:rotate-0 transition-transform duration-300 origin-center group cursor-pointer">
+        <div className="hidden md:block fixed bottom-10 right-6 md:right-10 z-[60] rotate-3 hover:rotate-0 transition-transform duration-300 origin-center group cursor-pointer">
             <a href="tel:+16054137661" className="block relative">
                 {/* Shadow */}
                 <div className="absolute inset-0 bg-black/20 translate-x-2 translate-y-2 blur-sm rounded-sm group-hover:opacity-0 transition-opacity duration-300" />

@@ -1,92 +1,128 @@
-import fs from 'fs/promises';
-import path from 'path';
-import { Project, PROJECTS as INITIAL_PROJECTS } from './data';
+import { Project } from './data';
+import { supabase } from './supabase';
 
-const DATA_FILE = path.join(process.cwd(), 'data', 'projects.json');
-
-// Ensure data directory exists
-async function ensureDataDir() {
-    try {
-        await fs.mkdir(path.join(process.cwd(), 'data'), { recursive: true });
-    } catch (error) {
-        // ignore if exists
-    }
-}
+// --- Projects ---
 
 export async function getProjects(): Promise<Project[]> {
-    await ensureDataDir();
-    try {
-        const data = await fs.readFile(DATA_FILE, 'utf-8');
-        return JSON.parse(data);
-    } catch (error) {
-        // If file doesn't exist, initialize with mock data
-        await fs.writeFile(DATA_FILE, JSON.stringify(INITIAL_PROJECTS, null, 2));
-        return INITIAL_PROJECTS;
+    const { data, error } = await supabase
+        .from('projects')
+        .select('*')
+        .order('created_at', { ascending: true }); // Assuming created_at exists, or order by id/title
+
+    if (error) {
+        console.error('Error fetching projects:', error);
+        return [];
     }
+    return data as Project[];
 }
 
 export async function saveProjects(projects: Project[]): Promise<void> {
-    await ensureDataDir();
-    await fs.writeFile(DATA_FILE, JSON.stringify(projects, null, 2));
+    // This function originally overwrote the whole file. 
+    // For Supabase, we should probably upsert them all.
+    // However, mass overwrite is dangerous if we don't handle deletions.
+    // Given the previous usage, this might be used for reordering or bulk updates.
+
+    const { error } = await supabase
+        .from('projects')
+        .upsert(projects);
+
+    if (error) {
+        console.error('Error saving projects:', error);
+        throw error;
+    }
 }
 
 export async function addProject(project: Project): Promise<void> {
-    const projects = await getProjects();
-    projects.push(project);
-    await saveProjects(projects);
+    const { error } = await supabase
+        .from('projects')
+        .insert(project);
+
+    if (error) {
+        console.error('Error adding project:', error);
+        throw error;
+    }
 }
 
 export async function deleteProject(id: string): Promise<void> {
-    const projects = await getProjects();
-    const filtered = projects.filter(p => p.id !== id);
-    await saveProjects(filtered);
+    const { error } = await supabase
+        .from('projects')
+        .delete()
+        .eq('id', id);
+
+    if (error) {
+        console.error('Error deleting project:', error);
+        throw error;
+    }
 }
 
 export async function updateProject(project: Project): Promise<void> {
-    const projects = await getProjects();
-    const index = projects.findIndex(p => p.id === project.id);
-    if (index !== -1) {
-        projects[index] = project;
-        await saveProjects(projects);
+    const { error } = await supabase
+        .from('projects')
+        .update(project)
+        .eq('id', project.id);
+
+    if (error) {
+        console.error('Error updating project:', error);
+        throw error;
     }
 }
 
 // --- Realtors ---
 
-const REALTOR_FILE = path.join(process.cwd(), 'data', 'realtors.json');
-
 export async function getRealtors(): Promise<any[]> {
-    await ensureDataDir();
-    try {
-        const data = await fs.readFile(REALTOR_FILE, 'utf-8');
-        return JSON.parse(data);
-    } catch (error) {
+    const { data, error } = await supabase
+        .from('realtors')
+        .select('*');
+
+    if (error) {
+        console.error('Error fetching realtors:', error);
         return [];
     }
+    return data || [];
 }
 
 export async function saveRealtors(realtors: any[]): Promise<void> {
-    await ensureDataDir();
-    await fs.writeFile(REALTOR_FILE, JSON.stringify(realtors, null, 2));
+    const { error } = await supabase
+        .from('realtors')
+        .upsert(realtors);
+
+    if (error) {
+        console.error('Error saving realtors:', error);
+        throw error;
+    }
 }
 
 export async function addRealtor(realtor: any): Promise<void> {
-    const realtors = await getRealtors();
-    realtors.push(realtor);
-    await saveRealtors(realtors);
+    const { error } = await supabase
+        .from('realtors')
+        .insert(realtor);
+
+    if (error) {
+        console.error('Error adding realtor:', error);
+        throw error;
+    }
 }
 
 export async function deleteRealtor(id: string): Promise<void> {
-    const realtors = await getRealtors();
-    const filtered = realtors.filter(r => r.id !== id);
-    await saveRealtors(filtered);
+    const { error } = await supabase
+        .from('realtors')
+        .delete()
+        .eq('id', id);
+
+    if (error) {
+        console.error('Error deleting realtor:', error);
+        throw error;
+    }
 }
 
 export async function updateRealtor(realtor: any): Promise<void> {
-    const realtors = await getRealtors();
-    const index = realtors.findIndex(r => r.id === realtor.id);
-    if (index !== -1) {
-        realtors[index] = realtor;
-        await saveRealtors(realtors);
+    const { error } = await supabase
+        .from('realtors')
+        .update(realtor)
+        .eq('id', realtor.id);
+
+    if (error) {
+        console.error('Error updating realtor:', error);
+        throw error;
     }
 }

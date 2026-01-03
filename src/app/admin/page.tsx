@@ -342,7 +342,7 @@ export default function AdminPage() {
     }
 
     return (
-        <div className='min-h-screen p-6 pt-32 md:p-12 md:pt-40 max-w-7xl mx-auto'>
+        <div className='min-h-screen p-6 pt-24 md:p-12 md:pt-40 max-w-7xl mx-auto'>
             <header className="flex justify-between items-end mb-8 border-b border-blueprint-line pb-6">
                 <div>
                     <h1 className='font-architect text-4xl text-white'>Project Control</h1>

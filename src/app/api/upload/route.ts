@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
-import { writeFile } from 'fs/promises';
-import { join } from 'path';
 import sharp from 'sharp';
+import { supabase } from '@/lib/supabase';
 
 export async function POST(request: Request) {
     const data = await request.formData();
@@ -32,11 +31,24 @@ export async function POST(request: Request) {
     const safeName = file.name.replace(/\.[^/.]+$/, "");
     const name = `${Date.now()}-${safeName}.jpg`;
 
-    const path = join(process.cwd(), 'public', 'uploads', name);
-
     try {
-        await writeFile(path, processedBuffer);
-        return NextResponse.json({ success: true, url: `/uploads/${name}` });
+        const { data: uploadData, error } = await supabase.storage
+            .from('images')
+            .upload(name, processedBuffer, {
+                contentType: 'image/jpeg',
+                upsert: true
+            });
+
+        if (error) {
+            console.error('Supabase upload error:', error);
+            throw error;
+        }
+
+        const { data: { publicUrl } } = supabase.storage
+            .from('images')
+            .getPublicUrl(name);
+
+        return NextResponse.json({ success: true, url: publicUrl });
     } catch (e) {
         console.error("Upload error:", e);
         return NextResponse.json({ success: false, error: 'Upload failed' }, { status: 500 });
