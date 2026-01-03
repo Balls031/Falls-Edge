@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import sharp from 'sharp';
-import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase';
 
 export async function POST(request: Request) {
     const data = await request.formData();
@@ -32,7 +32,7 @@ export async function POST(request: Request) {
     const name = `${Date.now()}-${safeName}.jpg`;
 
     try {
-        const { data: uploadData, error } = await supabase.storage
+        const { data: uploadData, error } = await supabaseAdmin.storage
             .from('images')
             .upload(name, processedBuffer, {
                 contentType: 'image/jpeg',
@@ -44,7 +44,7 @@ export async function POST(request: Request) {
             throw error;
         }
 
-        const { data: { publicUrl } } = supabase.storage
+        const { data: { publicUrl } } = supabaseAdmin.storage
             .from('images')
             .getPublicUrl(name);
 

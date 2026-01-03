@@ -1,10 +1,13 @@
 import { Project } from './data';
-import { supabase } from './supabase';
+import { supabase, supabaseAdmin } from './supabase';
+
+// Use admin client if available (server-side), otherwise falls back to public client
+const db = supabaseAdmin;
 
 // --- Projects ---
 
 export async function getProjects(): Promise<Project[]> {
-    const { data, error } = await supabase
+    const { data, error } = await db
         .from('projects')
         .select('*')
         .order('created_at', { ascending: true }); // Assuming created_at exists, or order by id/title
@@ -22,7 +25,7 @@ export async function saveProjects(projects: Project[]): Promise<void> {
     // However, mass overwrite is dangerous if we don't handle deletions.
     // Given the previous usage, this might be used for reordering or bulk updates.
 
-    const { error } = await supabase
+    const { error } = await db
         .from('projects')
         .upsert(projects);
 
@@ -33,7 +36,7 @@ export async function saveProjects(projects: Project[]): Promise<void> {
 }
 
 export async function addProject(project: Project): Promise<void> {
-    const { error } = await supabase
+    const { error } = await db
         .from('projects')
         .insert(project);
 
@@ -44,7 +47,7 @@ export async function addProject(project: Project): Promise<void> {
 }
 
 export async function deleteProject(id: string): Promise<void> {
-    const { error } = await supabase
+    const { error } = await db
         .from('projects')
         .delete()
         .eq('id', id);
@@ -56,7 +59,7 @@ export async function deleteProject(id: string): Promise<void> {
 }
 
 export async function updateProject(project: Project): Promise<void> {
-    const { error } = await supabase
+    const { error } = await db
         .from('projects')
         .update(project)
         .eq('id', project.id);
@@ -70,7 +73,7 @@ export async function updateProject(project: Project): Promise<void> {
 // --- Realtors ---
 
 export async function getRealtors(): Promise<any[]> {
-    const { data, error } = await supabase
+    const { data, error } = await db
         .from('realtors')
         .select('*');
 
@@ -82,7 +85,7 @@ export async function getRealtors(): Promise<any[]> {
 }
 
 export async function saveRealtors(realtors: any[]): Promise<void> {
-    const { error } = await supabase
+    const { error } = await db
         .from('realtors')
         .upsert(realtors);
 
@@ -93,7 +96,7 @@ export async function saveRealtors(realtors: any[]): Promise<void> {
 }
 
 export async function addRealtor(realtor: any): Promise<void> {
-    const { error } = await supabase
+    const { error } = await db
         .from('realtors')
         .insert(realtor);
 
@@ -104,7 +107,7 @@ export async function addRealtor(realtor: any): Promise<void> {
 }
 
 export async function deleteRealtor(id: string): Promise<void> {
-    const { error } = await supabase
+    const { error } = await db
         .from('realtors')
         .delete()
         .eq('id', id);
@@ -116,7 +119,7 @@ export async function deleteRealtor(id: string): Promise<void> {
 }
 
 export async function updateRealtor(realtor: any): Promise<void> {
-    const { error } = await supabase
+    const { error } = await db
         .from('realtors')
         .update(realtor)
         .eq('id', realtor.id);
