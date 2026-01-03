@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import { NextResponse } from 'next/server';
 import { getRealtors, addRealtor, deleteRealtor, updateRealtor } from '@/lib/storage';
 import { Realtor } from '@/lib/data';
@@ -39,45 +38,3 @@ export async function DELETE(request: Request) {
     await deleteRealtor(id);
     return NextResponse.json({ success: true });
 }
-=======
-import { NextResponse } from 'next/server';
-import { getRealtors, addRealtor, deleteRealtor, updateRealtor } from '@/lib/storage';
-import { Realtor } from '@/lib/data';
-
-export async function GET() {
-    const realtors = await getRealtors();
-    return NextResponse.json(realtors);
-}
-
-export async function POST(request: Request) {
-    const body = await request.json();
-    if (!body.name || !body.id) {
-        return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
-    }
-
-    await addRealtor(body as Realtor);
-    return NextResponse.json({ success: true });
-}
-
-export async function PUT(request: Request) {
-    const body = await request.json();
-    if (!body.name || !body.id) {
-        return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
-    }
-
-    await updateRealtor(body as Realtor);
-    return NextResponse.json({ success: true });
-}
-
-export async function DELETE(request: Request) {
-    const { searchParams } = new URL(request.url);
-    const id = searchParams.get('id');
-
-    if (!id) {
-        return NextResponse.json({ error: 'Missing ID' }, { status: 400 });
-    }
-
-    await deleteRealtor(id);
-    return NextResponse.json({ success: true });
-}
->>>>>>> f23c7ec5816116c984b5737788af5cbb8de299c1
