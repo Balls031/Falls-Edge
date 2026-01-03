@@ -19,7 +19,7 @@ export async function POST(request: Request) {
         return NextResponse.json({ success: true });
     } catch (error) {
         console.error('API Error:', error);
-        return NextResponse.json({ error: 'Failed to create project', details: String(error) }, { status: 500 });
+        return NextResponse.json({ error: 'Failed to create project', details: JSON.stringify(error) }, { status: 500 });
     }
 }
 
@@ -34,7 +34,7 @@ export async function PUT(request: Request) {
         return NextResponse.json({ success: true });
     } catch (error) {
         console.error('API Error:', error);
-        return NextResponse.json({ error: 'Failed to update project', details: String(error) }, { status: 500 });
+        return NextResponse.json({ error: 'Failed to update project', details: JSON.stringify(error) }, { status: 500 });
     }
 }
 
