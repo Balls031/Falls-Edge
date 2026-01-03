@@ -1,0 +1,28 @@
+@import "tailwindcss";
+
+@theme {
+  --color-blueprint: #0e1014;
+  --color-blueprint-line: rgba(255, 255, 255, 0.20);
+  --color-blueprint-accent: #00f0ff;
+  --color-blueprint-text: #e0e0e0;
+
+  --font-architect: var(--font-architect);
+  --font-tech: var(--font-tech);
+}
+
+@layer base {
+  body {
+    background-color: var(--color-blueprint);
+    color: var(--color-blueprint-text);
+  }
+}
+
+@layer utilities {
+  .bg-blueprint-grid {
+    background-image:
+      linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    background-size: 40px 40px;
+    background-position: top center;
+  }
+}
