@@ -8,23 +8,33 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-    const body = await request.json();
-    if (!body.name || !body.id) {
-        return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
-    }
+    try {
+        const body = await request.json();
+        if (!body.name || !body.id) {
+            return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
+        }
 
-    await addRealtor(body as Realtor);
-    return NextResponse.json({ success: true });
+        await addRealtor(body as Realtor);
+        return NextResponse.json({ success: true });
+    } catch (error) {
+        console.error('API Error:', error);
+        return NextResponse.json({ error: 'Failed to create realtor', details: String(error) }, { status: 500 });
+    }
 }
 
 export async function PUT(request: Request) {
-    const body = await request.json();
-    if (!body.name || !body.id) {
-        return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
-    }
+    try {
+        const body = await request.json();
+        if (!body.name || !body.id) {
+            return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
+        }
 
-    await updateRealtor(body as Realtor);
-    return NextResponse.json({ success: true });
+        await updateRealtor(body as Realtor);
+        return NextResponse.json({ success: true });
+    } catch (error) {
+        console.error('API Error:', error);
+        return NextResponse.json({ error: 'Failed to update realtor', details: String(error) }, { status: 500 });
+    }
 }
 
 export async function DELETE(request: Request) {

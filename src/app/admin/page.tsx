@@ -145,17 +145,22 @@ export default function AdminPage() {
             };
 
             const method = editingRealtorId ? 'PUT' : 'POST';
-            await fetch('/api/realtors', {
+            const res = await fetch('/api/realtors', {
                 method,
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(realtorData)
             });
 
+            if (!res.ok) {
+                const errorData = await res.json();
+                throw new Error(errorData.error || errorData.details || 'Failed to save');
+            }
+
             fetchRealtors();
             resetRealtorForm();
             alert('Realtor Saved');
         } catch (e) {
-            alert('Error saving realtor');
+            alert('Error saving realtor: ' + e);
         } finally {
             setLoading(false);
         }
@@ -301,10 +306,13 @@ export default function AdminPage() {
                 alert(editingId ? 'Project Updated!' : 'Project Added!');
                 fetchProjects();
                 resetForm();
+            } else {
+                const errorData = await res.json();
+                throw new Error(errorData.error || errorData.details || 'Failed to save');
             }
         } catch (error) {
             console.error(error);
-            alert('Error saving project');
+            alert('Error saving project: ' + error);
         } finally {
             setLoading(false);
         }
@@ -367,25 +375,25 @@ export default function AdminPage() {
 
                             <form onSubmit={handleRealtorSubmit} className="space-y-4">
                                 <div>
-                                    <label className="block text-[10px] uppercase text-gray-500 mb-1">Name</label>
-                                    <input value={rName} onChange={e => setRName(e.target.value)} className="w-full bg-black/20 border border-blueprint-line p-2 text-white font-mono" required placeholder="Full Name" />
+                                    <label htmlFor="rName" className="block text-[10px] uppercase text-gray-500 mb-1">Name</label>
+                                    <input id="rName" name="name" value={rName} onChange={e => setRName(e.target.value)} className="w-full bg-black/20 border border-blueprint-line p-2 text-white font-mono" required placeholder="Full Name" />
                                 </div>
                                 <div>
-                                    <label className="block text-[10px] uppercase text-gray-500 mb-1">Title</label>
-                                    <input value={rTitle} onChange={e => setRTitle(e.target.value)} className="w-full bg-black/20 border border-blueprint-line p-2 text-white font-mono" required placeholder="e.g. Listing Agent" />
+                                    <label htmlFor="rTitle" className="block text-[10px] uppercase text-gray-500 mb-1">Title</label>
+                                    <input id="rTitle" name="title" value={rTitle} onChange={e => setRTitle(e.target.value)} className="w-full bg-black/20 border border-blueprint-line p-2 text-white font-mono" required placeholder="e.g. Listing Agent" />
                                 </div>
                                 <div>
-                                    <label className="block text-[10px] uppercase text-gray-500 mb-1">Phone</label>
-                                    <input value={rPhone} onChange={e => setRPhone(e.target.value)} className="w-full bg-black/20 border border-blueprint-line p-2 text-white font-mono" required placeholder="e.g. (605) 555-0123" />
+                                    <label htmlFor="rPhone" className="block text-[10px] uppercase text-gray-500 mb-1">Phone</label>
+                                    <input id="rPhone" name="phone" value={rPhone} onChange={e => setRPhone(e.target.value)} className="w-full bg-black/20 border border-blueprint-line p-2 text-white font-mono" required placeholder="e.g. (605) 555-0123" />
                                 </div>
                                 <div>
-                                    <label className="block text-[10px] uppercase text-gray-500 mb-1">Agency (Optional)</label>
-                                    <input value={rAgency} onChange={e => setRAgency(e.target.value)} className="w-full bg-black/20 border border-blueprint-line p-2 text-white font-mono" placeholder="e.g. Hegg Realtors" />
+                                    <label htmlFor="rAgency" className="block text-[10px] uppercase text-gray-500 mb-1">Agency (Optional)</label>
+                                    <input id="rAgency" name="agency" value={rAgency} onChange={e => setRAgency(e.target.value)} className="w-full bg-black/20 border border-blueprint-line p-2 text-white font-mono" placeholder="e.g. Hegg Realtors" />
                                 </div>
                                 <div>
-                                    <label className="block text-[10px] uppercase text-gray-500 mb-1">Headshot</label>
-                                    <input type="file" onChange={e => setRImageFile(e.target.files?.[0] || null)} className="w-full text-xs text-gray-500" accept="image/*" />
-                                    {rImageUrl && <img src={rImageUrl} className="w-20 h-20 object-cover mt-2 border border-blueprint-line" />}
+                                    <label htmlFor="rImage" className="block text-[10px] uppercase text-gray-500 mb-1">Headshot</label>
+                                    <input id="rImage" name="image" type="file" onChange={e => setRImageFile(e.target.files?.[0] || null)} className="w-full text-xs text-gray-500" accept="image/*" />
+                                    {rImageUrl && <img src={rImageUrl} className="w-20 h-20 object-cover mt-2 border border-blueprint-line" alt="Realtor headshot" />}
                                 </div>
                                 <button disabled={loading} className="w-full bg-white text-black font-bold py-3 uppercase tracking-widest hover:bg-blueprint-accent transition-colors mt-4">
                                     {loading ? 'Saving...' : 'Save Realtor'}
@@ -430,8 +438,8 @@ export default function AdminPage() {
                                 {/* Project Number & Featured */}
                                 <div className="flex gap-4">
                                     <div className="flex-1">
-                                        <label className="block text-[10px] uppercase text-gray-500 mb-2">Project Number (Optional)</label>
-                                        <input value={projectNumber} onChange={e => setProjectNumber(e.target.value)} className="w-full bg-black/20 border border-blueprint-line p-3 text-white focus:border-blueprint-accent outline-none font-mono text-lg" placeholder="e.g. 101" />
+                                        <label htmlFor="projectNumber" className="block text-[10px] uppercase text-gray-500 mb-2">Project Number (Optional)</label>
+                                        <input id="projectNumber" name="projectNumber" value={projectNumber} onChange={e => setProjectNumber(e.target.value)} className="w-full bg-black/20 border border-blueprint-line p-3 text-white focus:border-blueprint-accent outline-none font-mono text-lg" placeholder="e.g. 101" />
                                     </div>
                                     <div className="flex items-end pb-3">
                                         <label className="flex items-center gap-2 cursor-pointer group">
@@ -443,42 +451,42 @@ export default function AdminPage() {
 
                                 <div className="grid md:grid-cols-2 gap-6">
                                     <div>
-                                        <label className="block text-[10px] uppercase text-gray-500 mb-2">Project Title</label>
-                                        <input value={title} onChange={e => setTitle(e.target.value)} className="w-full bg-black/20 border border-blueprint-line p-3 text-white focus:border-blueprint-accent outline-none font-architect text-xl" required />
+                                        <label htmlFor="title" className="block text-[10px] uppercase text-gray-500 mb-2">Project Title</label>
+                                        <input id="title" name="title" value={title} onChange={e => setTitle(e.target.value)} className="w-full bg-black/20 border border-blueprint-line p-3 text-white focus:border-blueprint-accent outline-none font-architect text-xl" required />
                                     </div>
                                     <div>
-                                        <label className="block text-[10px] uppercase text-gray-500 mb-2">Location</label>
-                                        <input value={location} onChange={e => setLocation(e.target.value)} className="w-full bg-black/20 border border-blueprint-line p-3 text-white focus:border-blueprint-accent outline-none font-mono text-sm" required />
+                                        <label htmlFor="location" className="block text-[10px] uppercase text-gray-500 mb-2">Location</label>
+                                        <input id="location" name="location" value={location} onChange={e => setLocation(e.target.value)} className="w-full bg-black/20 border border-blueprint-line p-3 text-white focus:border-blueprint-accent outline-none font-mono text-sm" required />
                                     </div>
                                 </div>
 
                                 <div>
-                                    <label className="block text-[10px] uppercase text-gray-500 mb-2">Sign ID / QR Code (e.g. sign1)</label>
-                                    <input value={qrCode} onChange={e => setQrCode(e.target.value)} className="w-full bg-black/20 border border-blueprint-line p-3 text-white focus:border-blueprint-accent outline-none font-mono text-sm" placeholder="e.g. sign1" />
+                                    <label htmlFor="qrCode" className="block text-[10px] uppercase text-gray-500 mb-2">Sign ID / QR Code (e.g. sign1)</label>
+                                    <input id="qrCode" name="qrCode" value={qrCode} onChange={e => setQrCode(e.target.value)} className="w-full bg-black/20 border border-blueprint-line p-3 text-white focus:border-blueprint-accent outline-none font-mono text-sm" placeholder="e.g. sign1" />
                                 </div>
 
                                 <div>
-                                    <label className="block text-[10px] uppercase text-gray-500 mb-2">Description</label>
-                                    <textarea value={description} onChange={e => setDescription(e.target.value)} className="w-full bg-black/20 border border-blueprint-line p-3 text-white focus:border-blueprint-accent outline-none h-32 font-mono text-sm" required />
+                                    <label htmlFor="description" className="block text-[10px] uppercase text-gray-500 mb-2">Description</label>
+                                    <textarea id="description" name="description" value={description} onChange={e => setDescription(e.target.value)} className="w-full bg-black/20 border border-blueprint-line p-3 text-white focus:border-blueprint-accent outline-none h-32 font-mono text-sm" required />
                                 </div>
 
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                    <input value={totalSqft} onChange={e => setTotalSqft(e.target.value)} className="w-full bg-black/20 border border-blueprint-line p-2 text-white font-mono" placeholder="Total SqFt" />
-                                    <input value={finishedSqft} onChange={e => setFinishedSqft(e.target.value)} className="w-full bg-black/20 border border-blueprint-line p-2 text-white font-mono" placeholder="Finished SqFt" />
-                                    <input value={unfinishedSqft} onChange={e => setUnfinishedSqft(e.target.value)} className="w-full bg-black/20 border border-blueprint-line p-2 text-white font-mono" placeholder="Unfinished SqFt" />
-                                    <input value={price} onChange={e => setPrice(e.target.value)} className="w-full bg-black/20 border border-blueprint-line p-2 text-white font-mono" placeholder="Price" />
+                                    <input id="totalSqft" name="totalSqft" aria-label="Total SqFt" value={totalSqft} onChange={e => setTotalSqft(e.target.value)} className="w-full bg-black/20 border border-blueprint-line p-2 text-white font-mono" placeholder="Total SqFt" />
+                                    <input id="finishedSqft" name="finishedSqft" aria-label="Finished SqFt" value={finishedSqft} onChange={e => setFinishedSqft(e.target.value)} className="w-full bg-black/20 border border-blueprint-line p-2 text-white font-mono" placeholder="Finished SqFt" />
+                                    <input id="unfinishedSqft" name="unfinishedSqft" aria-label="Unfinished SqFt" value={unfinishedSqft} onChange={e => setUnfinishedSqft(e.target.value)} className="w-full bg-black/20 border border-blueprint-line p-2 text-white font-mono" placeholder="Unfinished SqFt" />
+                                    <input id="price" name="price" aria-label="Price" value={price} onChange={e => setPrice(e.target.value)} className="w-full bg-black/20 border border-blueprint-line p-2 text-white font-mono" placeholder="Price" />
                                 </div>
 
                                 <div className="grid grid-cols-3 gap-4">
-                                    <input type="number" value={bed} onChange={e => setBed(e.target.value)} className="w-full bg-black/20 border border-blueprint-line p-2 text-white font-mono" placeholder="Beds" />
-                                    <input type="number" value={bath} onChange={e => setBath(e.target.value)} className="w-full bg-black/20 border border-blueprint-line p-2 text-white font-mono" placeholder="Baths" />
-                                    <input type="text" value={garage} onChange={e => setGarage(e.target.value)} className="w-full bg-black/20 border border-blueprint-line p-2 text-white font-mono" placeholder="Garage" />
-                                    <select value={status} onChange={e => setStatus(e.target.value as any)} className="w-full bg-black/20 border border-blueprint-line p-2 text-white font-mono">
+                                    <input id="bed" name="bed" aria-label="Beds" type="number" value={bed} onChange={e => setBed(e.target.value)} className="w-full bg-black/20 border border-blueprint-line p-2 text-white font-mono" placeholder="Beds" />
+                                    <input id="bath" name="bath" aria-label="Baths" type="number" value={bath} onChange={e => setBath(e.target.value)} className="w-full bg-black/20 border border-blueprint-line p-2 text-white font-mono" placeholder="Baths" />
+                                    <input id="garage" name="garage" aria-label="Garage" type="text" value={garage} onChange={e => setGarage(e.target.value)} className="w-full bg-black/20 border border-blueprint-line p-2 text-white font-mono" placeholder="Garage" />
+                                    <select id="status" name="status" aria-label="Status" value={status} onChange={e => setStatus(e.target.value as any)} className="w-full bg-black/20 border border-blueprint-line p-2 text-white font-mono">
                                         <option value="available">Available</option>
                                         <option value="sold">Sold</option>
                                         <option value="pending">Pending</option>
                                     </select>
-                                    <select value={imageFit} onChange={e => setImageFit(e.target.value as any)} className="w-full bg-black/20 border border-blueprint-line p-2 text-white font-mono">
+                                    <select id="imageFit" name="imageFit" aria-label="Image Fit" value={imageFit} onChange={e => setImageFit(e.target.value as any)} className="w-full bg-black/20 border border-blueprint-line p-2 text-white font-mono">
                                         <option value="contain">Fit: Contain (Default)</option>
                                         <option value="cover">Fit: Cover (Crop)</option>
                                         <option value="fill">Fit: Fill (Stretch)</option>

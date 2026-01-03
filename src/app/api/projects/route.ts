@@ -8,24 +8,34 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-    const body = await request.json();
-    // Basic validation
-    if (!body.title || !body.id) {
-        return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
-    }
+    try {
+        const body = await request.json();
+        // Basic validation
+        if (!body.title || !body.id) {
+            return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
+        }
 
-    await addProject(body as Project);
-    return NextResponse.json({ success: true });
+        await addProject(body as Project);
+        return NextResponse.json({ success: true });
+    } catch (error) {
+        console.error('API Error:', error);
+        return NextResponse.json({ error: 'Failed to create project', details: String(error) }, { status: 500 });
+    }
 }
 
 export async function PUT(request: Request) {
-    const body = await request.json();
-    if (!body.title || !body.id) {
-        return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
-    }
+    try {
+        const body = await request.json();
+        if (!body.title || !body.id) {
+            return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
+        }
 
-    await updateProject(body as Project);
-    return NextResponse.json({ success: true });
+        await updateProject(body as Project);
+        return NextResponse.json({ success: true });
+    } catch (error) {
+        console.error('API Error:', error);
+        return NextResponse.json({ error: 'Failed to update project', details: String(error) }, { status: 500 });
+    }
 }
 
 export async function DELETE(request: Request) {
