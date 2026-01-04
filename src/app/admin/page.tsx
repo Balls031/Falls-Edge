@@ -309,11 +309,14 @@ export default function AdminPage() {
                 resetForm();
             } else {
                 const errorData = await res.json();
-                throw new Error(errorData.error || errorData.details || 'Failed to save');
+                const errorMessage = errorData.details
+                    ? `${errorData.error}: ${errorData.details}`
+                    : (errorData.error || 'Failed to save');
+                throw new Error(errorMessage);
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error(error);
-            alert('Error saving project: ' + error);
+            alert('Error saving project: ' + (error.message || error));
         } finally {
             setLoading(false);
         }
