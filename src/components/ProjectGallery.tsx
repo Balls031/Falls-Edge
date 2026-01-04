@@ -78,22 +78,22 @@ function ProjectItem({ project, index }: { project: Project; index: number }) {
                                 </p>
                             </div>
 
-                            <div className="mt-8 grid grid-cols-2 md:grid-cols-4 py-4 border-t border-b border-blueprint-line">
-                                <div className="text-center group cursor-default border-r border-b md:border-b-0 border-blueprint-line">
-                                    <span className="block text-2xl text-white font-architect transition-colors tracking-widest">{project.specs.finishedSqft}</span>
-                                    <span className="text-[10px] uppercase text-gray-500 tracking-wider block">Finished</span>
+                            <div className="mt-8 grid grid-cols-2 md:grid-cols-4 py-4 border-t border-b border-blueprint-line h-auto md:h-24">
+                                <div className="text-center group cursor-default border-r border-b md:border-b-0 border-blueprint-line flex flex-col justify-center items-center h-full p-2">
+                                    <span className="block text-2xl text-white font-architect transition-colors tracking-widest leading-none mb-1">{project.specs.finishedSqft} Sq Ft</span>
+                                    <span className="text-[10px] uppercase text-gray-500 tracking-wider block leading-none">Finished</span>
                                 </div>
-                                <div className="text-center group cursor-default border-b md:border-b-0 md:border-r border-blueprint-line">
-                                    <span className="block text-2xl text-white font-architect transition-colors tracking-widest">{project.specs.bed}</span>
-                                    <span className="text-[10px] uppercase text-gray-500 tracking-wider">Beds</span>
+                                <div className="text-center group cursor-default border-b md:border-b-0 md:border-r border-blueprint-line flex flex-col justify-center items-center h-full p-2">
+                                    <span className="block text-2xl text-white font-architect transition-colors tracking-widest leading-none mb-1">{project.specs.bed}</span>
+                                    <span className="text-[10px] uppercase text-gray-500 tracking-wider leading-none">Beds</span>
                                 </div>
-                                <div className="text-center group cursor-default border-r border-blueprint-line">
-                                    <span className="block text-2xl text-white font-architect transition-colors tracking-widest">{project.specs.bath}</span>
-                                    <span className="text-[10px] uppercase text-gray-500 tracking-wider">Baths</span>
+                                <div className="text-center group cursor-default border-r border-blueprint-line flex flex-col justify-center items-center h-full p-2">
+                                    <span className="block text-2xl text-white font-architect transition-colors tracking-widest leading-none mb-1">{project.specs.bath}</span>
+                                    <span className="text-[10px] uppercase text-gray-500 tracking-wider leading-none">Baths</span>
                                 </div>
-                                <div className="text-center group cursor-default">
-                                    <span className="block text-2xl text-white font-architect transition-colors tracking-widest">{project.specs.garage}</span>
-                                    <span className="text-[10px] uppercase text-gray-500 tracking-wider">Garage</span>
+                                <div className="text-center group cursor-default flex flex-col justify-center items-center h-full p-2">
+                                    <span className="block text-2xl text-white font-architect transition-colors tracking-widest leading-none mb-1">{project.specs.garage}</span>
+                                    <span className="text-[10px] uppercase text-gray-500 tracking-wider leading-none">Garage</span>
                                 </div>
                             </div>
                         </Link>
@@ -128,11 +128,13 @@ function ProjectItem({ project, index }: { project: Project; index: number }) {
                                 transition={{ duration: 0.4 }}
                                 className="absolute inset-0 w-full h-full flex items-center justify-center bg-black/40"
                             >
-                                <img
-                                    src={view === 'photo' ? project.image : (project.blueprint || (project.blueprints && project.blueprints[0]) || '')}
-                                    alt={project.title}
-                                    className={`w-full h-full ${view === 'photo' && project.imageFit === 'cover' ? 'object-cover' : view === 'photo' && project.imageFit === 'fill' ? 'object-fill' : 'object-contain'}`}
-                                />
+                                <Link href={`/projects/${project.id}`} className="block w-full h-full">
+                                    <img
+                                        src={view === 'photo' ? project.image : (project.blueprint || (project.blueprints && project.blueprints[0]) || '')}
+                                        alt={project.title}
+                                        className={`w-full h-full ${view === 'photo' && project.imageFit === 'cover' ? 'object-cover' : view === 'photo' && project.imageFit === 'fill' ? 'object-fill' : 'object-contain'}`}
+                                    />
+                                </Link>
                             </motion.div>
                         </AnimatePresence>
 

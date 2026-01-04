@@ -14,7 +14,9 @@ export default function ProjectDetailView({ project }: { project: Project }) {
     const [photoIndex, setPhotoIndex] = useState(0);
     const [isNarrativeOpen, setIsNarrativeOpen] = useState(false);
 
-    const allPhotos = (project.gallery && project.gallery.length > 0) ? project.gallery : [project.image];
+    const galleryPhotos = (project.gallery && project.gallery.length > 0) ? project.gallery : [project.image];
+    const blueprints = project.blueprints || (project.blueprint ? [project.blueprint] : []);
+    const allPhotos = [...galleryPhotos, ...blueprints];
 
     const openLightbox = (index: number) => {
         setPhotoIndex(index);
@@ -60,7 +62,7 @@ export default function ProjectDetailView({ project }: { project: Project }) {
                     <div className="md:col-span-8">
                         <div
                             onClick={() => openLightbox(0)}
-                            className="w-full aspect-video border border-blueprint-line p-2 relative cursor-zoom-in group"
+                            className="w-full aspect-video border border-blueprint-line p-2 relative cursor-pointer group"
                         >
                             <div className="absolute -top-[1px] -left-[1px] w-4 h-4 border-t border-l border-white/50" />
                             <div className="absolute -top-[1px] -right-[1px] w-4 h-4 border-t border-r border-white/50" />
@@ -130,11 +132,11 @@ export default function ProjectDetailView({ project }: { project: Project }) {
                                 <div className="space-y-6 md:space-y-6">
                                     <div className="flex flex-col-reverse md:flex-row md:justify-between items-center md:items-baseline gap-1 md:gap-0 border-b border-white/10 pb-2">
                                         <span className="text-gray-500 text-xs md:text-sm uppercase tracking-wider">Finished</span>
-                                        <span className="text-2xl text-white font-mono">{project.specs.finishedSqft}</span>
+                                        <span className="text-2xl text-white font-mono">{project.specs.finishedSqft} Sq Ft</span>
                                     </div>
                                     <div className="flex flex-col-reverse md:flex-row md:justify-between items-center md:items-baseline gap-1 md:gap-0 border-b border-white/10 pb-2">
                                         <span className="text-gray-500 text-xs md:text-sm uppercase tracking-wider">Unfinished</span>
-                                        <span className="text-2xl text-white font-mono">{project.specs.unfinishedSqft}</span>
+                                        <span className="text-2xl text-white font-mono">{project.specs.unfinishedSqft} Sq Ft</span>
                                     </div>
                                 </div>
                             </div>
@@ -169,7 +171,7 @@ export default function ProjectDetailView({ project }: { project: Project }) {
                                 <div
                                     key={i}
                                     onClick={() => openLightbox(i)}
-                                    className="aspect-[4/3] border border-blueprint-line p-2 relative group hover:border-white transition-colors cursor-zoom-in"
+                                    className="aspect-[4/3] border border-blueprint-line p-2 relative group hover:border-white transition-colors cursor-pointer"
                                 >
                                     <div className="absolute -top-[1px] -left-[1px] w-2 h-2 border-t border-l border-white/50" />
                                     <div className="absolute -top-[1px] -right-[1px] w-2 h-2 border-t border-r border-white/50" />
