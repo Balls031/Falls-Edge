@@ -33,10 +33,10 @@ export default function ContactCard({ realtor, className = '', name, phone, titl
     return (
         <div className={`relative border border-blueprint-line p-6 w-full text-center bg-blueprint/70 backdrop-blur-md group text-white flex flex-col justify-center ${className}`}>
             {/* Technical corners */}
-            <div className="absolute -top-1 -left-1 w-3 h-3 border-t border-l border-white/50" />
-            <div className="absolute -top-1 -right-1 w-3 h-3 border-t border-r border-white/50" />
-            <div className="absolute -bottom-1 -left-1 w-3 h-3 border-b border-l border-white/50" />
-            <div className="absolute -bottom-1 -right-1 w-3 h-3 border-b border-r border-white/50" />
+            <div className="absolute -top-[1px] -left-[1px] w-3 h-3 border-t border-l border-white/50" />
+            <div className="absolute -top-[1px] -right-[1px] w-3 h-3 border-t border-r border-white/50" />
+            <div className="absolute -bottom-[1px] -left-[1px] w-3 h-3 border-b border-l border-white/50" />
+            <div className="absolute -bottom-[1px] -right-[1px] w-3 h-3 border-b border-r border-white/50" />
 
             <div className="flex items-center gap-4 text-left">
                 {/* Photo */}

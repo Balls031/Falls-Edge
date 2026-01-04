@@ -34,10 +34,10 @@ export default function ProjectDetailView({ project }: { project: Project }) {
             <header className="w-full px-[40px] md:px-[80px] mb-8 relative">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-end border-b border-blueprint-line pb-8">
                     {/* Left: Title & Info */}
-                    <div className="border-l-2 border-blueprint-accent pl-6 mt-12 mb-8 md:mb-0">
-                        <span className="block text-blueprint-accent font-mono text-sm tracking-[0.3em] mb-2">PROJECT NO. {(project.projectNumber || project.id).padStart(3, '0')}</span>
-                        <h1 className="text-5xl md:text-7xl font-architect text-white mb-2 leading-none">{project.title}</h1>
-                        <p className="text-xl text-gray-400 font-tech">{project.location}</p>
+                    <div className="border-l-2 border-blueprint-accent pl-4 md:pl-6 mt-4 md:mt-12 mb-8 md:mb-0">
+                        <span className="block text-blueprint-accent font-mono text-xs md:text-sm tracking-[0.3em] mb-1">PROJECT NO. {(project.projectNumber || project.id).padStart(3, '0')}</span>
+                        <h1 className="text-3xl sm:text-5xl md:text-7xl font-architect text-white mb-1 leading-none">{project.title}</h1>
+                        <p className="text-base md:text-xl text-gray-400 font-tech">{project.location}</p>
                     </div>
 
 
@@ -62,10 +62,10 @@ export default function ProjectDetailView({ project }: { project: Project }) {
                             onClick={() => openLightbox(0)}
                             className="w-full aspect-video border border-blueprint-line p-2 relative cursor-zoom-in group"
                         >
-                            <div className="absolute top-0 left-0 w-4 h-4 border-t border-l border-blueprint-accent" />
-                            <div className="absolute top-0 right-0 w-4 h-4 border-t border-r border-blueprint-accent" />
-                            <div className="absolute bottom-0 left-0 w-4 h-4 border-b border-l border-blueprint-accent" />
-                            <div className="absolute bottom-0 right-0 w-4 h-4 border-b border-r border-blueprint-accent" />
+                            <div className="absolute -top-[1px] -left-[1px] w-4 h-4 border-t border-l border-white/50" />
+                            <div className="absolute -top-[1px] -right-[1px] w-4 h-4 border-t border-r border-white/50" />
+                            <div className="absolute -bottom-[1px] -left-[1px] w-4 h-4 border-b border-l border-white/50" />
+                            <div className="absolute -bottom-[1px] -right-[1px] w-4 h-4 border-b border-r border-white/50" />
                             <img src={project.image} className="w-full h-full object-cover grayscale-[0.2] group-hover:grayscale-0 transition-all" alt="Main View" />
                         </div>
 
@@ -107,34 +107,43 @@ export default function ProjectDetailView({ project }: { project: Project }) {
                         />
 
                         {/* Specs Grid (Compacted) */}
-                        <div className="grid grid-cols-[1.2fr_0.8fr] gap-x-4 gap-y-3"> {/* Reduced gap-y */}
-                            {/* Left Column Items */}
-                            <div className="flex flex-col gap-3">
-                                <div>
-                                    <span className="block text-gray-500 text-[10px] uppercase tracking-wider mb-1">Price</span>
-                                    <span className="block text-xl text-white font-mono tracking-widest">{project.specs.price || 'Inquire'}</span>
-                                </div>
-                                <div>
-                                    <span className="block text-gray-500 text-[10px] uppercase tracking-wider mb-1">Config</span>
-                                    <span className="block text-xl text-white font-mono tracking-widest whitespace-nowrap">{project.specs.bed} Bd&nbsp;&nbsp;{project.specs.bath} Ba</span>
-                                </div>
-                                <div>
-                                    <span className="block text-gray-500 text-[10px] uppercase tracking-wider mb-1">Garage</span>
-                                    <span className="block text-xl text-white font-mono tracking-widest">{project.specs.garage}</span>
-                                </div>
+                        {/* Specs Grid (Compacted & Refactored) */}
+                        <div className="flex flex-col gap-6">
+                            {/* Price - Centered Top */}
+                            <div className="text-center border-b border-blueprint-line pb-4">
+                                <span className="block text-gray-500 text-[10px] uppercase tracking-wider mb-1">Price</span>
+                                <span className="block text-3xl md:text-4xl text-white font-mono tracking-widest">{project.specs.price || 'Inquire'}</span>
                             </div>
 
-                            {/* Right Column Items */}
-                            <div className="flex flex-col gap-3 items-end text-right">
-                                <div>
-                                    <span className="block text-gray-500 text-[10px] uppercase tracking-wider mb-1">Finished</span>
-                                    <span className="block text-xl text-white font-mono tracking-widest">{project.specs.finishedSqft}</span>
+                            {/* Details Grid */}
+                            <div className="grid grid-cols-2 gap-x-8 gap-y-4">
+                                {/* Left Column */}
+                                <div className="space-y-4">
+                                    <div className="flex justify-between items-baseline border-b border-white/10 pb-1">
+                                        <span className="text-gray-500 text-[10px] uppercase tracking-wider">Beds</span>
+                                        <span className="text-xl text-white font-mono">{project.specs.bed}</span>
+                                    </div>
+                                    <div className="flex justify-between items-baseline border-b border-white/10 pb-1">
+                                        <span className="text-gray-500 text-[10px] uppercase tracking-wider">Baths</span>
+                                        <span className="text-xl text-white font-mono">{project.specs.bath}</span>
+                                    </div>
+                                    <div className="flex justify-between items-baseline border-b border-white/10 pb-1">
+                                        <span className="text-gray-500 text-[10px] uppercase tracking-wider">Garage</span>
+                                        <span className="text-xl text-white font-mono">{project.specs.garage}</span>
+                                    </div>
                                 </div>
-                                <div>
-                                    <span className="block text-gray-500 text-[10px] uppercase tracking-wider mb-1">Unfinished</span>
-                                    <span className="block text-xl text-white font-mono tracking-widest">{project.specs.unfinishedSqft}</span>
+
+                                {/* Right Column */}
+                                <div className="space-y-4">
+                                    <div className="flex justify-between items-baseline border-b border-white/10 pb-1">
+                                        <span className="text-gray-500 text-[10px] uppercase tracking-wider">Finished</span>
+                                        <span className="text-xl text-white font-mono">{project.specs.finishedSqft}</span>
+                                    </div>
+                                    <div className="flex justify-between items-baseline border-b border-white/10 pb-1">
+                                        <span className="text-gray-500 text-[10px] uppercase tracking-wider">Unfinished</span>
+                                        <span className="text-xl text-white font-mono">{project.specs.unfinishedSqft}</span>
+                                    </div>
                                 </div>
-                                {/* Removed Total SqFt */}
                             </div>
                         </div>
 
@@ -163,8 +172,10 @@ export default function ProjectDetailView({ project }: { project: Project }) {
                                     onClick={() => openLightbox(i)}
                                     className="aspect-[4/3] border border-blueprint-line p-2 relative group hover:border-white transition-colors cursor-zoom-in"
                                 >
-                                    <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-blueprint-accent opacity-50" />
-                                    <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-blueprint-accent opacity-50" />
+                                    <div className="absolute -top-[1px] -left-[1px] w-2 h-2 border-t border-l border-white/50" />
+                                    <div className="absolute -top-[1px] -right-[1px] w-2 h-2 border-t border-r border-white/50" />
+                                    <div className="absolute -bottom-[1px] -left-[1px] w-2 h-2 border-b border-l border-white/50" />
+                                    <div className="absolute -bottom-[1px] -right-[1px] w-2 h-2 border-b border-r border-white/50" />
                                     <img src={img} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" alt={`Detail ${i}`} />
                                     <span className="absolute bottom-3 right-3 text-[10px] text-white bg-black/50 px-1 font-mono">FIG. {i + 1}</span>
                                 </div>

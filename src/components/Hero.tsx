@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 
 export default function Hero() {
     return (
-        <section className="relative w-full h-[45vh] md:h-[55vh] flex flex-col items-center justify-end pb-8 px-4 pt-20 md:pb-24 md:px-8 md:pt-8 overflow-hidden">
+        <section className="relative w-full h-[45vh] md:h-[55vh] flex flex-col items-center justify-end pb-32 px-4 pt-20 md:pb-24 md:px-8 md:pt-8 overflow-hidden">
             {/* Animated "Draw" Container */}
             <div className="relative p-6 md:p-20">
                 {/* Technical Corners - Thicker */}
