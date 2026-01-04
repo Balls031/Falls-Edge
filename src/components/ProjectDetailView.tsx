@@ -98,7 +98,7 @@ export default function ProjectDetailView({ project }: { project: Project }) {
                                 </div>
                                 <div>
                                     <span className="block text-gray-500 text-[10px] uppercase tracking-wider mb-1">Config</span>
-                                    <span className="block text-xl text-white font-mono tracking-widest">{project.specs.bed} Bd &nbsp;&nbsp; {project.specs.bath} Ba</span>
+                                    <span className="block text-xl text-white font-mono tracking-widest whitespace-nowrap">{project.specs.bed} Bd &nbsp;&nbsp; {project.specs.bath} Ba</span>
                                 </div>
                                 <div>
                                     <span className="block text-gray-500 text-[10px] uppercase tracking-wider mb-1">Garage</span>

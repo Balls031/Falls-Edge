@@ -80,19 +80,19 @@ function ProjectItem({ project, index }: { project: Project; index: number }) {
 
                             <div className="mt-8 grid grid-cols-2 md:grid-cols-4 py-4 border-t border-b border-blueprint-line divide-x divide-blueprint-line">
                                 <div className="text-center group cursor-default">
-                                    <span className="block text-2xl text-white font-architect transition-colors">{project.specs.bed}</span>
+                                    <span className="block text-2xl text-white font-architect transition-colors tracking-widest">{project.specs.bed}</span>
                                     <span className="text-[10px] uppercase text-gray-500 tracking-wider">Beds</span>
                                 </div>
                                 <div className="text-center group cursor-default">
-                                    <span className="block text-2xl text-white font-architect transition-colors">{project.specs.bath}</span>
+                                    <span className="block text-2xl text-white font-architect transition-colors tracking-widest">{project.specs.bath}</span>
                                     <span className="text-[10px] uppercase text-gray-500 tracking-wider">Baths</span>
                                 </div>
                                 <div className="text-center group cursor-default">
-                                    <span className="block text-2xl text-white font-architect transition-colors">{project.specs.garage}</span>
+                                    <span className="block text-2xl text-white font-architect transition-colors tracking-widest">{project.specs.garage}</span>
                                     <span className="text-[10px] uppercase text-gray-500 tracking-wider">Garage</span>
                                 </div>
                                 <div className="text-center group cursor-default">
-                                    <span className="block text-2xl text-white font-architect transition-colors">{project.specs.finishedSqft}</span>
+                                    <span className="block text-2xl text-white font-architect transition-colors tracking-widest">{project.specs.finishedSqft}</span>
                                     <span className="text-[10px] uppercase text-gray-500 tracking-wider block">Finished</span>
                                 </div>
                             </div>
