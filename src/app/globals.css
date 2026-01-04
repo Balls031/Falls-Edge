@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme {
-  --color-blueprint: #0e1014;
+  --color-blueprint: #223248;
   --color-blueprint-line: rgba(255, 255, 255, 0.20);
   --color-blueprint-accent: #00f0ff;
   --color-blueprint-text: #e0e0e0;
