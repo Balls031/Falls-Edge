@@ -66,12 +66,7 @@ export default function ContactCard({ realtor, className = '', name, phone, titl
                 might imply compact. Let's keep it but make it possibly optional if we supported that.
                 For now, keeping it as it looks good.
             */}
-            <div className="mt-6 pt-4 border-t border-blueprint-line/30">
-                <button className="relative w-full py-2 border border-blueprint-accent text-blueprint-accent hover:text-black font-bold uppercase tracking-widest text-[10px] overflow-hidden group transition-colors">
-                    <span className="relative z-10 group-hover:text-black transition-colors">Request a Build</span>
-                    <div className="absolute inset-0 bg-blueprint-accent translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out z-0" />
-                </button>
-            </div>
+
         </div>
     )
 }
