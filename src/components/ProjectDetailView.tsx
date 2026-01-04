@@ -6,11 +6,13 @@ import ContactCard from '@/components/ContactCard';
 import ProjectTabs from '@/components/ProjectTabs';
 import Lightbox from '@/components/Lightbox';
 import { useState } from 'react';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 
 export default function ProjectDetailView({ project }: { project: Project }) {
     const [tab, setTab] = useState<'photos' | 'plans'>('photos');
     const [lightboxOpen, setLightboxOpen] = useState(false);
     const [photoIndex, setPhotoIndex] = useState(0);
+    const [isNarrativeOpen, setIsNarrativeOpen] = useState(false);
 
     const allPhotos = (project.gallery && project.gallery.length > 0) ? project.gallery : [project.image];
 
@@ -68,16 +70,31 @@ export default function ProjectDetailView({ project }: { project: Project }) {
                         </div>
 
                         {/* Design Narrative Block (Moved here) */}
-                        <div className="relative border border-blueprint-line p-6 bg-blueprint/70 backdrop-blur-md mt-8">
+                        <div className="relative border border-blueprint-line bg-blueprint/70 backdrop-blur-md mt-8">
                             <div className="absolute -top-[1px] -left-[1px] w-3 h-3 border-t border-l border-white/50" />
                             <div className="absolute -top-[1px] -right-[1px] w-3 h-3 border-t border-r border-white/50" />
                             <div className="absolute -bottom-[1px] -left-[1px] w-3 h-3 border-b border-l border-white/50" />
                             <div className="absolute -bottom-[1px] -right-[1px] w-3 h-3 border-b border-r border-white/50" />
 
-                            <h3 className="text-white font-bold uppercase tracking-widest mb-4 font-mono text-sm border-b border-blueprint-line pb-2">Narrative</h3>
-                            <p className="text-gray-400 leading-relaxed font-tech text-sm">
-                                {project.longDescription || project.description}
-                            </p>
+                            {/* Header / Toggle */}
+                            <button
+                                onClick={() => setIsNarrativeOpen(!isNarrativeOpen)}
+                                className="w-full flex items-center justify-between p-6 md:cursor-default"
+                            >
+                                <h3 className="text-white font-bold uppercase tracking-widest font-mono text-sm">Narrative</h3>
+                                <div className="md:hidden text-blueprint-accent">
+                                    {isNarrativeOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                                </div>
+                            </button>
+
+                            {/* Content - Hidden on Mobile unless Open, Always visible on Desktop */}
+                            <div className={`px-6 pb-6 md:block ${isNarrativeOpen ? 'block' : 'hidden'}`}>
+                                <div className="border-t border-blueprint-line pt-4 md:pt-2 md:border-t-0 md:mt-0"> {/* Mobile has top border when open */}
+                                    <p className="text-gray-400 leading-relaxed font-tech text-sm">
+                                        {project.longDescription || project.description}
+                                    </p>
+                                </div>
+                            </div>
                         </div>
                     </div>
 

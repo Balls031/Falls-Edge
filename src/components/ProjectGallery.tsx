@@ -14,16 +14,16 @@ export default function ProjectGallery({ initialProjects = [], showTitle = true 
     const projects = initialProjects;
 
     return (
-        <section className="w-full max-w-[1340px] min-[2000px]:max-w-[1700px] mx-auto pt-0 pb-40 relative z-10 px-4 md:px-12">
+        <section className="w-full max-w-[1340px] min-[2000px]:max-w-[1700px] mx-auto pt-0 pb-12 md:pb-40 relative z-10 px-4 md:px-12">
 
             {/* Section Header */}
             {showTitle && (
-                <div className="text-center mb-20 relative">
+                <div className="text-center mb-8 md:mb-20 relative">
                     <h2 className="font-architect text-3xl md:text-4xl text-white inline-block border-b border-blueprint-accent pb-2">Selected Projects</h2>
                 </div>
             )}
 
-            <div className="space-y-[80px]"> {/* 80px gap = 2 grid units */}
+            <div className="space-y-[40px] md:space-y-[80px]"> {/* 80px gap = 2 grid units */}
                 {projects.map((project, index) => (
                     <ProjectItem key={project.id} project={project} index={index} />
                 ))}
