@@ -38,13 +38,7 @@ export default function ProjectDetailView({ project }: { project: Project }) {
                         <p className="text-xl text-gray-400 font-tech">{project.location}</p>
                     </div>
 
-                    {/* Right: Contact Card */}
-                    <div className="w-full md:w-auto flex flex-col items-start md:items-end">
-                        <ContactCard
-                            realtor={project.realtors?.[0]}
-                            className="w-full md:w-[350px]"
-                        />
-                    </div>
+
                 </div>
 
                 {/* Status Stamp */}
@@ -72,13 +66,9 @@ export default function ProjectDetailView({ project }: { project: Project }) {
                             <div className="absolute bottom-0 right-0 w-4 h-4 border-b border-r border-blueprint-accent" />
                             <img src={project.image} className="w-full h-full object-cover grayscale-[0.2] group-hover:grayscale-0 transition-all" alt="Main View" />
                         </div>
-                    </div>
 
-                    {/* RIGHT: Details & Narrative */}
-                    <div className="md:col-span-4 flex flex-col gap-8">
-
-                        {/* Design Narrative Block */}
-                        <div className="relative border border-blueprint-line p-6 bg-blueprint/70 backdrop-blur-md">
+                        {/* Design Narrative Block (Moved here) */}
+                        <div className="relative border border-blueprint-line p-6 bg-blueprint/70 backdrop-blur-md mt-8">
                             <div className="absolute -top-[1px] -left-[1px] w-3 h-3 border-t border-l border-white/50" />
                             <div className="absolute -top-[1px] -right-[1px] w-3 h-3 border-t border-r border-white/50" />
                             <div className="absolute -bottom-[1px] -left-[1px] w-3 h-3 border-b border-l border-white/50" />
@@ -89,11 +79,20 @@ export default function ProjectDetailView({ project }: { project: Project }) {
                                 {project.longDescription || project.description}
                             </p>
                         </div>
+                    </div>
 
-                        {/* Specs Grid (Adapted to narrower column) */}
-                        <div className="grid grid-cols-[1.2fr_0.8fr] gap-x-4 gap-y-6">
+                    {/* RIGHT: Details & Narrative */}
+                    <div className="md:col-span-4 flex flex-col gap-8">
+                        {/* Contact Card (Moved here) */}
+                        <ContactCard
+                            realtor={project.realtors?.[0]}
+                            className="w-full"
+                        />
+
+                        {/* Specs Grid (Compacted) */}
+                        <div className="grid grid-cols-[1.2fr_0.8fr] gap-x-4 gap-y-3"> {/* Reduced gap-y */}
                             {/* Left Column Items */}
-                            <div className="flex flex-col gap-6">
+                            <div className="flex flex-col gap-3">
                                 <div>
                                     <span className="block text-gray-500 text-[10px] uppercase tracking-wider mb-1">Price</span>
                                     <span className="block text-xl text-white font-mono tracking-widest">{project.specs.price || 'Inquire'}</span>
@@ -109,7 +108,7 @@ export default function ProjectDetailView({ project }: { project: Project }) {
                             </div>
 
                             {/* Right Column Items */}
-                            <div className="flex flex-col gap-6 items-end text-right">
+                            <div className="flex flex-col gap-3 items-end text-right">
                                 <div>
                                     <span className="block text-gray-500 text-[10px] uppercase tracking-wider mb-1">Finished</span>
                                     <span className="block text-xl text-white font-mono tracking-widest">{project.specs.finishedSqft}</span>
@@ -118,18 +117,13 @@ export default function ProjectDetailView({ project }: { project: Project }) {
                                     <span className="block text-gray-500 text-[10px] uppercase tracking-wider mb-1">Unfinished</span>
                                     <span className="block text-xl text-white font-mono tracking-widest">{project.specs.unfinishedSqft}</span>
                                 </div>
-                                <div>
-                                    <span className="block text-gray-500 text-[10px] uppercase tracking-wider mb-1">Total SqFt</span>
-                                    <span className="block text-xl text-white font-mono tracking-widest">{project.specs.totalSqft}</span>
-                                </div>
+                                {/* Removed Total SqFt */}
                             </div>
                         </div>
 
                         {/* Realtor 2 (if exists) */}
                         {project.realtors?.[1] && (
-                            <div className="mt-4">
-                                <ContactCard realtor={project.realtors[1]} />
-                            </div>
+                            <ContactCard realtor={project.realtors[1]} className="w-full" />
                         )}
                     </div>
                 </div>
