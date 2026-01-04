@@ -119,7 +119,7 @@ export default function ProjectDetailView({ project }: { project: Project }) {
             {/* Visual Documentation */}
             <section className="w-full px-[40px] md:px-[80px] mb-[40px]">
                 <div className="mb-0 flex items-end justify-between border-b border-blueprint-line pb-2">
-                    <h3 className="font-architect text-2xl text-white mr-12">Visual Documentation</h3>
+                    <h3 className="font-architect text-2xl text-white mr-12">Images</h3>
                     <ProjectTabs view={tab} onChange={setTab} />
                 </div>
 
