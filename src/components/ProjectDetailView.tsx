@@ -90,29 +90,36 @@ export default function ProjectDetailView({ project }: { project: Project }) {
 
                         {/* Specs Grid (Adapted to narrower column) */}
                         <div className="grid grid-cols-2 gap-x-4 gap-y-6">
-                            <div>
-                                <span className="block text-gray-500 text-[10px] uppercase tracking-wider mb-1">Price</span>
-                                <span className="block text-xl text-white font-mono">{project.specs.price || 'Inquire'}</span>
+                            {/* Left Column Items */}
+                            <div className="flex flex-col gap-6">
+                                <div>
+                                    <span className="block text-gray-500 text-[10px] uppercase tracking-wider mb-1">Price</span>
+                                    <span className="block text-xl text-white font-mono tracking-widest">{project.specs.price || 'Inquire'}</span>
+                                </div>
+                                <div>
+                                    <span className="block text-gray-500 text-[10px] uppercase tracking-wider mb-1">Config</span>
+                                    <span className="block text-xl text-white font-mono tracking-widest">{project.specs.bed} Bd &nbsp;&nbsp; {project.specs.bath} Ba</span>
+                                </div>
+                                <div>
+                                    <span className="block text-gray-500 text-[10px] uppercase tracking-wider mb-1">Garage</span>
+                                    <span className="block text-xl text-white font-mono tracking-widest">{project.specs.garage}</span>
+                                </div>
                             </div>
-                            <div>
-                                <span className="block text-gray-500 text-[10px] uppercase tracking-wider mb-1">Config</span>
-                                <span className="block text-xl text-white font-mono">{project.specs.bed} Bd / {project.specs.bath} Ba</span>
-                            </div>
-                            <div>
-                                <span className="block text-gray-500 text-[10px] uppercase tracking-wider mb-1">Garage</span>
-                                <span className="block text-xl text-white font-mono">{project.specs.garage}</span>
-                            </div>
-                            <div>
-                                <span className="block text-gray-500 text-[10px] uppercase tracking-wider mb-1">Total SqFt</span>
-                                <span className="block text-xl text-white font-mono">{project.specs.totalSqft}</span>
-                            </div>
-                            <div>
-                                <span className="block text-gray-500 text-[10px] uppercase tracking-wider mb-1">Finished</span>
-                                <span className="block text-xl text-white font-mono">{project.specs.finishedSqft}</span>
-                            </div>
-                            <div>
-                                <span className="block text-gray-500 text-[10px] uppercase tracking-wider mb-1">Unfinished</span>
-                                <span className="block text-xl text-white font-mono">{project.specs.unfinishedSqft}</span>
+
+                            {/* Right Column Items */}
+                            <div className="flex flex-col gap-6">
+                                <div>
+                                    <span className="block text-gray-500 text-[10px] uppercase tracking-wider mb-1">Finished</span>
+                                    <span className="block text-xl text-white font-mono tracking-widest">{project.specs.finishedSqft}</span>
+                                </div>
+                                <div>
+                                    <span className="block text-gray-500 text-[10px] uppercase tracking-wider mb-1">Unfinished</span>
+                                    <span className="block text-xl text-white font-mono tracking-widest">{project.specs.unfinishedSqft}</span>
+                                </div>
+                                <div>
+                                    <span className="block text-gray-500 text-[10px] uppercase tracking-wider mb-1">Total SqFt</span>
+                                    <span className="block text-xl text-white font-mono tracking-widest">{project.specs.totalSqft}</span>
+                                </div>
                             </div>
                         </div>
 
