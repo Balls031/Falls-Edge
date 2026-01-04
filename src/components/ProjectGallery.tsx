@@ -140,10 +140,10 @@ function ProjectItem({ project, index }: { project: Project; index: number }) {
 
 
 
-                        {/* Detail Link Overlay helper message */}
-                        <Link href={`/projects/${project.id}`} className="absolute bottom-6 right-6 opacity-0 group-hover:opacity-100 transition-opacity bg-black/50 text-white text-xs px-3 py-1 font-mono border border-white/50 hover:bg-blueprint-accent hover:text-black hover:border-blueprint-accent">
-                            VIEW DETAILS
-                        </Link>
+                        {/* Price Tag Overlay */}
+                        <div className="absolute bottom-6 right-6 bg-black/70 text-white font-mono tracking-widest px-4 py-2 border border-white/30 backdrop-blur-sm z-10 text-sm md:text-base cursor-default">
+                            {project.specs.price || 'Inquire'}
+                        </div>
                     </div>
                 </div>
             </div>
