@@ -114,15 +114,15 @@ export default function ProjectDetailView({ project }: { project: Project }) {
                             <div className="grid grid-cols-2 gap-x-8 gap-y-4">
                                 {/* Left Column */}
                                 <div className="space-y-6 md:space-y-6">
-                                    <div className="flex flex-col-reverse md:flex-row md:justify-between items-center md:items-baseline gap-1 md:gap-0 border-b border-white/10 pb-2">
+                                    <div className="flex flex-col-reverse items-center gap-1 border-b border-white/10 pb-2">
                                         <span className="text-gray-500 text-xs md:text-sm uppercase tracking-wider">Beds</span>
                                         <span className="text-2xl text-white font-mono">{project.specs.bed}</span>
                                     </div>
-                                    <div className="flex flex-col-reverse md:flex-row md:justify-between items-center md:items-baseline gap-1 md:gap-0 border-b border-white/10 pb-2">
+                                    <div className="flex flex-col-reverse items-center gap-1 border-b border-white/10 pb-2">
                                         <span className="text-gray-500 text-xs md:text-sm uppercase tracking-wider">Baths</span>
                                         <span className="text-2xl text-white font-mono">{project.specs.bath}</span>
                                     </div>
-                                    <div className="flex flex-col-reverse md:flex-row md:justify-between items-center md:items-baseline gap-1 md:gap-0 border-b border-white/10 pb-2">
+                                    <div className="flex flex-col-reverse items-center gap-1 border-b border-white/10 pb-2">
                                         <span className="text-gray-500 text-xs md:text-sm uppercase tracking-wider">Garage</span>
                                         <span className="text-2xl text-white font-mono">{project.specs.garage}</span>
                                     </div>
@@ -130,13 +130,13 @@ export default function ProjectDetailView({ project }: { project: Project }) {
 
                                 {/* Right Column */}
                                 <div className="space-y-6 md:space-y-6">
-                                    <div className="flex flex-col-reverse md:flex-row md:justify-between items-center md:items-baseline gap-1 md:gap-0 border-b border-white/10 pb-2">
-                                        <span className="text-gray-500 text-xs md:text-sm uppercase tracking-wider">Finished</span>
-                                        <span className="text-2xl text-white font-mono">{project.specs.finishedSqft} Sq Ft</span>
+                                    <div className="flex flex-col-reverse items-center gap-1 border-b border-white/10 pb-2">
+                                        <span className="text-gray-500 text-xs md:text-sm uppercase tracking-wider">Finished Sq Ft</span>
+                                        <span className="text-2xl text-white font-mono">{project.specs.finishedSqft}</span>
                                     </div>
-                                    <div className="flex flex-col-reverse md:flex-row md:justify-between items-center md:items-baseline gap-1 md:gap-0 border-b border-white/10 pb-2">
-                                        <span className="text-gray-500 text-xs md:text-sm uppercase tracking-wider">Unfinished</span>
-                                        <span className="text-2xl text-white font-mono">{project.specs.unfinishedSqft} Sq Ft</span>
+                                    <div className="flex flex-col-reverse items-center gap-1 border-b border-white/10 pb-2">
+                                        <span className="text-gray-500 text-xs md:text-sm uppercase tracking-wider">Unfinished Sq Ft</span>
+                                        <span className="text-2xl text-white font-mono">{project.specs.unfinishedSqft}</span>
                                     </div>
                                 </div>
                             </div>

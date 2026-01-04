@@ -80,20 +80,20 @@ function ProjectItem({ project, index }: { project: Project; index: number }) {
 
                             <div className="mt-8 grid grid-cols-2 md:grid-cols-4 py-4 border-t border-b border-blueprint-line h-auto md:h-24">
                                 <div className="text-center group cursor-default border-r border-b md:border-b-0 border-blueprint-line flex flex-col justify-center items-center h-full p-2">
-                                    <span className="block text-2xl text-white font-architect transition-colors tracking-widest leading-none mb-1">{project.specs.finishedSqft} Sq Ft</span>
-                                    <span className="text-[10px] uppercase text-gray-500 tracking-wider block leading-none">Finished</span>
+                                    <span className="block text-2xl text-white font-architect transition-colors tracking-widest leading-none mb-1">{project.specs.finishedSqft}</span>
+                                    <span className="text-xs uppercase text-gray-500 tracking-wider block leading-none">Finished Sq Ft</span>
                                 </div>
                                 <div className="text-center group cursor-default border-b md:border-b-0 md:border-r border-blueprint-line flex flex-col justify-center items-center h-full p-2">
                                     <span className="block text-2xl text-white font-architect transition-colors tracking-widest leading-none mb-1">{project.specs.bed}</span>
-                                    <span className="text-[10px] uppercase text-gray-500 tracking-wider leading-none">Beds</span>
+                                    <span className="text-xs uppercase text-gray-500 tracking-wider leading-none">Beds</span>
                                 </div>
                                 <div className="text-center group cursor-default border-r border-blueprint-line flex flex-col justify-center items-center h-full p-2">
                                     <span className="block text-2xl text-white font-architect transition-colors tracking-widest leading-none mb-1">{project.specs.bath}</span>
-                                    <span className="text-[10px] uppercase text-gray-500 tracking-wider leading-none">Baths</span>
+                                    <span className="text-xs uppercase text-gray-500 tracking-wider leading-none">Baths</span>
                                 </div>
                                 <div className="text-center group cursor-default flex flex-col justify-center items-center h-full p-2">
                                     <span className="block text-2xl text-white font-architect transition-colors tracking-widest leading-none mb-1">{project.specs.garage}</span>
-                                    <span className="text-[10px] uppercase text-gray-500 tracking-wider leading-none">Garage</span>
+                                    <span className="text-xs uppercase text-gray-500 tracking-wider leading-none">Garage</span>
                                 </div>
                             </div>
                         </Link>
