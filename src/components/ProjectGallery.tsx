@@ -48,9 +48,9 @@ function ProjectItem({ project, index }: { project: Project; index: number }) {
                 <div className="absolute -bottom-[1px] -left-[1px] w-4 h-4 border-b-2 border-l-2 border-white/30" />
                 <div className="absolute -bottom-[1px] -right-[1px] w-4 h-4 border-b-2 border-r-2 border-white/30" />
 
-                <div className="grid lg:grid-cols-[40%_60%] gap-0 bg-blueprint">
-                    {/* Content Left */}
-                    <div className="p-6 md:p-10 flex flex-col justify-between border-r border-blueprint-line/50 cursor-pointer"
+                <div className="flex flex-col-reverse md:grid lg:grid-cols-[40%_60%] gap-0 bg-blueprint">
+                    {/* Content Left (Bottom on Mobile) */}
+                    <div className="p-6 md:p-10 flex flex-col justify-between border-t md:border-t-0 md:border-r border-blueprint-line/50 cursor-pointer"
                         onClick={() => { }}
                     >
                         <Link href={`/projects/${project.id}`} className="block h-full flex flex-col justify-between">
