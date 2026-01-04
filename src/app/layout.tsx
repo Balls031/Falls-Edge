@@ -23,7 +23,7 @@ const sketch = Cabin_Sketch({
 });
 
 export const metadata: Metadata = {
-  title: "Falls Edge | Custom Homes",
+  title: "Falls Edge",
   description: "Building in Sioux Falls & Hartford, SD. Functional homes designed for real life.",
 };
 

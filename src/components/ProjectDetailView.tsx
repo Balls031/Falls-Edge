@@ -12,7 +12,7 @@ export default function ProjectDetailView({ project }: { project: Project }) {
     const [lightboxOpen, setLightboxOpen] = useState(false);
     const [photoIndex, setPhotoIndex] = useState(0);
 
-    const allPhotos = [project.image, ...(project.gallery || [])];
+    const allPhotos = (project.gallery && project.gallery.length > 0) ? project.gallery : [project.image];
 
     const openLightbox = (index: number) => {
         setPhotoIndex(index);
@@ -79,8 +79,10 @@ export default function ProjectDetailView({ project }: { project: Project }) {
 
                         {/* Design Narrative Block */}
                         <div className="relative border border-blueprint-line p-6 bg-blueprint/70 backdrop-blur-md">
-                            <div className="absolute -top-1 -left-1 w-3 h-3 border-t border-l border-white/50" />
-                            <div className="absolute -top-1 -right-1 w-3 h-3 border-t border-r border-white/50" />
+                            <div className="absolute -top-[1px] -left-[1px] w-3 h-3 border-t border-l border-white/50" />
+                            <div className="absolute -top-[1px] -right-[1px] w-3 h-3 border-t border-r border-white/50" />
+                            <div className="absolute -bottom-[1px] -left-[1px] w-3 h-3 border-b border-l border-white/50" />
+                            <div className="absolute -bottom-[1px] -right-[1px] w-3 h-3 border-b border-r border-white/50" />
 
                             <h3 className="text-white font-bold uppercase tracking-widest mb-4 font-mono text-sm border-b border-blueprint-line pb-2">Narrative</h3>
                             <p className="text-gray-400 leading-relaxed font-tech text-sm">
@@ -147,7 +149,7 @@ export default function ProjectDetailView({ project }: { project: Project }) {
                             {project.gallery?.map((img, i) => (
                                 <div
                                     key={i}
-                                    onClick={() => openLightbox(i + 1)}
+                                    onClick={() => openLightbox(i)}
                                     className="aspect-[4/3] border border-blueprint-line p-2 relative group hover:border-white transition-colors cursor-zoom-in"
                                 >
                                     <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-blueprint-accent opacity-50" />

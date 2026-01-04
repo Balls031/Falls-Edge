@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 type LightboxProps = {
     images: string[];
@@ -14,6 +14,30 @@ type LightboxProps = {
 };
 
 export default function Lightbox({ images, initialIndex, isOpen, onClose, onNext, onPrev }: LightboxProps) {
+    // Touch state for swipe
+    const [touchStart, setTouchStart] = useState<number | null>(null);
+    const [touchEnd, setTouchEnd] = useState<number | null>(null);
+
+    // Minimum swipe distance
+    const minSwipeDistance = 50;
+
+    const onTouchStart = (e: React.TouchEvent) => {
+        setTouchEnd(null); // Reset
+        setTouchStart(e.targetTouches[0].clientX);
+    };
+
+    const onTouchMove = (e: React.TouchEvent) => {
+        setTouchEnd(e.targetTouches[0].clientX);
+    };
+
+    const onTouchEnd = () => {
+        if (!touchStart || !touchEnd) return;
+        const distance = touchStart - touchEnd;
+        const isLeftSwipe = distance > minSwipeDistance;
+        const isRightSwipe = distance < -minSwipeDistance;
+        if (isLeftSwipe) onNext();
+        if (isRightSwipe) onPrev();
+    };
     // Keyboard support
     useEffect(() => {
         const handleKey = (e: KeyboardEvent) => {
@@ -38,6 +62,9 @@ export default function Lightbox({ images, initialIndex, isOpen, onClose, onNext
                     backgroundImage: `linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
                                     linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px)`
                 }}
+                onTouchStart={onTouchStart}
+                onTouchMove={onTouchMove}
+                onTouchEnd={onTouchEnd}
             >
                 {/* Close Button */}
                 <button onClick={onClose} className="absolute top-24 right-6 text-white hover:text-blueprint-accent bg-black/20 hover:bg-black/40 border border-white/10 p-2 z-20 transition-all rounded-sm backdrop-blur-sm">
@@ -45,12 +72,12 @@ export default function Lightbox({ images, initialIndex, isOpen, onClose, onNext
                 </button>
 
                 {/* Left Arrow (Fixed Position) */}
-                <button onClick={(e) => { e.stopPropagation(); onPrev(); }} className="absolute left-6 md:left-12 top-1/2 -translate-y-1/2 text-white hover:text-blueprint-accent p-4 z-20 bg-black/10 hover:bg-black/30 rounded-full transition-all">
+                <button onClick={(e) => { e.stopPropagation(); onPrev(); }} className="absolute left-6 bottom-8 md:left-12 md:top-1/2 md:bottom-auto md:-translate-y-1/2 text-white hover:text-blueprint-accent p-4 z-20 bg-black/10 hover:bg-black/30 rounded-full transition-all">
                     <ChevronLeft size={48} />
                 </button>
 
                 {/* Right Arrow (Fixed Position) */}
-                <button onClick={(e) => { e.stopPropagation(); onNext(); }} className="absolute right-6 md:right-12 top-1/2 -translate-y-1/2 text-white hover:text-blueprint-accent p-4 z-20 bg-black/10 hover:bg-black/30 rounded-full transition-all">
+                <button onClick={(e) => { e.stopPropagation(); onNext(); }} className="absolute right-6 bottom-8 md:right-12 md:top-1/2 md:bottom-auto md:-translate-y-1/2 text-white hover:text-blueprint-accent p-4 z-20 bg-black/10 hover:bg-black/30 rounded-full transition-all">
                     <ChevronRight size={48} />
                 </button>
 
