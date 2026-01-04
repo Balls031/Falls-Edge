@@ -89,7 +89,7 @@ export default function ProjectDetailView({ project }: { project: Project }) {
                         </div>
 
                         {/* Specs Grid (Adapted to narrower column) */}
-                        <div className="grid grid-cols-2 gap-x-4 gap-y-6">
+                        <div className="grid grid-cols-[1.2fr_0.8fr] gap-x-4 gap-y-6">
                             {/* Left Column Items */}
                             <div className="flex flex-col gap-6">
                                 <div>
@@ -98,7 +98,7 @@ export default function ProjectDetailView({ project }: { project: Project }) {
                                 </div>
                                 <div>
                                     <span className="block text-gray-500 text-[10px] uppercase tracking-wider mb-1">Config</span>
-                                    <span className="block text-xl text-white font-mono tracking-widest whitespace-nowrap">{project.specs.bed} Bd &nbsp;&nbsp; {project.specs.bath} Ba</span>
+                                    <span className="block text-xl text-white font-mono tracking-widest whitespace-nowrap">{project.specs.bed} Bd&nbsp;&nbsp;{project.specs.bath} Ba</span>
                                 </div>
                                 <div>
                                     <span className="block text-gray-500 text-[10px] uppercase tracking-wider mb-1">Garage</span>
@@ -107,7 +107,7 @@ export default function ProjectDetailView({ project }: { project: Project }) {
                             </div>
 
                             {/* Right Column Items */}
-                            <div className="flex flex-col gap-6">
+                            <div className="flex flex-col gap-6 items-end text-right">
                                 <div>
                                     <span className="block text-gray-500 text-[10px] uppercase tracking-wider mb-1">Finished</span>
                                     <span className="block text-xl text-white font-mono tracking-widest">{project.specs.finishedSqft}</span>
