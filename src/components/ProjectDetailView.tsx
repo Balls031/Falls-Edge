@@ -31,8 +31,8 @@ export default function ProjectDetailView({ project }: { project: Project }) {
             </div>
 
             {/* Header Area: Title & Contact Card */}
-            <header className="w-full px-[40px] md:px-[80px] mb-8 relative">
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-end border-b border-blueprint-line pb-8">
+            <header className="w-full px-[40px] md:px-[80px] mb-4 md:mb-8 relative">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-end border-b border-blueprint-line pb-4 md:pb-8">
                     {/* Left: Title & Info */}
                     <div className="border-l-2 border-blueprint-accent pl-4 md:pl-6 mt-4 md:mt-12 mb-8 md:mb-0">
                         <span className="block text-blueprint-accent font-mono text-xs md:text-sm tracking-[0.3em] mb-1">PROJECT NO. {(project.projectNumber || project.id).padStart(3, '0')}</span>
@@ -100,57 +100,56 @@ export default function ProjectDetailView({ project }: { project: Project }) {
 
                     {/* RIGHT: Details & Narrative */}
                     <div className="md:col-span-4 flex flex-col gap-8">
-                        {/* Contact Card (Moved here) */}
-                        <ContactCard
-                            realtor={project.realtors?.[0]}
-                            className="w-full"
-                        />
-
-                        {/* Specs Grid (Compacted) */}
                         {/* Specs Grid (Compacted & Refactored) */}
                         <div className="flex flex-col gap-6">
                             {/* Price - Centered Top */}
-                            <div className="text-center border-b border-blueprint-line pb-4">
-                                <span className="block text-gray-500 text-[10px] uppercase tracking-wider mb-1">Price</span>
-                                <span className="block text-3xl md:text-4xl text-white font-mono tracking-widest">{project.specs.price || 'Inquire'}</span>
+                            <div className="text-center border-b border-blueprint-line pb-6">
+                                <span className="block text-gray-500 text-xs md:text-sm uppercase tracking-wider mb-2">Price</span>
+                                <span className="block text-4xl md:text-5xl text-white font-mono tracking-widest">{project.specs.price || 'Inquire'}</span>
                             </div>
 
                             {/* Details Grid */}
                             <div className="grid grid-cols-2 gap-x-8 gap-y-4">
                                 {/* Left Column */}
-                                <div className="space-y-4">
-                                    <div className="flex justify-between items-baseline border-b border-white/10 pb-1">
-                                        <span className="text-gray-500 text-[10px] uppercase tracking-wider">Beds</span>
-                                        <span className="text-xl text-white font-mono">{project.specs.bed}</span>
+                                <div className="space-y-6">
+                                    <div className="flex justify-between items-baseline border-b border-white/10 pb-2">
+                                        <span className="text-gray-500 text-xs md:text-sm uppercase tracking-wider">Beds</span>
+                                        <span className="text-2xl text-white font-mono">{project.specs.bed}</span>
                                     </div>
-                                    <div className="flex justify-between items-baseline border-b border-white/10 pb-1">
-                                        <span className="text-gray-500 text-[10px] uppercase tracking-wider">Baths</span>
-                                        <span className="text-xl text-white font-mono">{project.specs.bath}</span>
+                                    <div className="flex justify-between items-baseline border-b border-white/10 pb-2">
+                                        <span className="text-gray-500 text-xs md:text-sm uppercase tracking-wider">Baths</span>
+                                        <span className="text-2xl text-white font-mono">{project.specs.bath}</span>
                                     </div>
-                                    <div className="flex justify-between items-baseline border-b border-white/10 pb-1">
-                                        <span className="text-gray-500 text-[10px] uppercase tracking-wider">Garage</span>
-                                        <span className="text-xl text-white font-mono">{project.specs.garage}</span>
+                                    <div className="flex justify-between items-baseline border-b border-white/10 pb-2">
+                                        <span className="text-gray-500 text-xs md:text-sm uppercase tracking-wider">Garage</span>
+                                        <span className="text-2xl text-white font-mono">{project.specs.garage}</span>
                                     </div>
                                 </div>
 
                                 {/* Right Column */}
-                                <div className="space-y-4">
-                                    <div className="flex justify-between items-baseline border-b border-white/10 pb-1">
-                                        <span className="text-gray-500 text-[10px] uppercase tracking-wider">Finished</span>
-                                        <span className="text-xl text-white font-mono">{project.specs.finishedSqft}</span>
+                                <div className="space-y-6">
+                                    <div className="flex justify-between items-baseline border-b border-white/10 pb-2">
+                                        <span className="text-gray-500 text-xs md:text-sm uppercase tracking-wider">Finished</span>
+                                        <span className="text-2xl text-white font-mono">{project.specs.finishedSqft}</span>
                                     </div>
-                                    <div className="flex justify-between items-baseline border-b border-white/10 pb-1">
-                                        <span className="text-gray-500 text-[10px] uppercase tracking-wider">Unfinished</span>
-                                        <span className="text-xl text-white font-mono">{project.specs.unfinishedSqft}</span>
+                                    <div className="flex justify-between items-baseline border-b border-white/10 pb-2">
+                                        <span className="text-gray-500 text-xs md:text-sm uppercase tracking-wider">Unfinished</span>
+                                        <span className="text-2xl text-white font-mono">{project.specs.unfinishedSqft}</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Realtor 2 (if exists) */}
-                        {project.realtors?.[1] && (
-                            <ContactCard realtor={project.realtors[1]} className="w-full" />
-                        )}
+                        {/* Contact Cards - Moved below Specs */}
+                        <div className="flex flex-col gap-8">
+                            <ContactCard
+                                realtor={project.realtors?.[0]}
+                                className="w-full"
+                            />
+                            {project.realtors?.[1] && (
+                                <ContactCard realtor={project.realtors[1]} className="w-full" />
+                            )}
+                        </div>
                     </div>
                 </div>
             </section>
@@ -212,7 +211,7 @@ export default function ProjectDetailView({ project }: { project: Project }) {
                         </div>
                     )}
                 </div>
-            </section>
+            </section >
 
             <Lightbox
                 isOpen={lightboxOpen}
@@ -222,6 +221,6 @@ export default function ProjectDetailView({ project }: { project: Project }) {
                 onNext={() => setPhotoIndex((i) => (i + 1) % allPhotos.length)}
                 onPrev={() => setPhotoIndex((i) => (i - 1 + allPhotos.length) % allPhotos.length)}
             />
-        </main>
+        </main >
     );
 }

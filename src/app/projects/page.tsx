@@ -22,9 +22,7 @@ export default async function ProjectsPage() {
 
             <ProjectGallery initialProjects={projects} showTitle={false} />
 
-            <div className="py-20">
-                <ContactCard />
-            </div>
+
 
             {/* Footer / Copyright */}
             <footer className="text-center py-10 text-xs text-white/30 font-mono border-t border-white/10 relative z-10 bg-blueprint">
