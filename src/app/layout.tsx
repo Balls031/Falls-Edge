@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Architects_Daughter, JetBrains_Mono, Cabin_Sketch } from "next/font/google"; // 1. Import
-import localFont from "next/font/local";
 import "./globals.css";
 
 import MouseTracer from "@/components/MouseTracer";
@@ -14,12 +13,6 @@ const architect = Architects_Daughter({
 const tech = JetBrains_Mono({
   variable: "--font-tech",
   subsets: ["latin"],
-});
-
-// 2. Typo Draft for Logo
-const draft = localFont({
-  src: "../assets/fonts/TypoDraft.ttf",
-  variable: "--font-draft",
 });
 
 // 2. Cabin Sketch for "Sketch Block" look
@@ -42,7 +35,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${architect.variable} ${tech.variable} ${draft.variable} ${sketch.variable} antialiased bg-blueprint text-blueprint-text font-tech overflow-x-hidden relative`}
+        className={`${architect.variable} ${tech.variable} ${sketch.variable} antialiased bg-blueprint text-blueprint-text font-tech overflow-x-hidden relative`}
       >
         <MouseTracer />
         <Header />

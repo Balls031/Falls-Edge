@@ -13,18 +13,41 @@ export default function MouseTracer() {
 
     useEffect(() => {
         let count = 0;
-        const handleMouseMove = (e: MouseEvent) => {
-            const newPoint = { x: e.clientX, y: e.clientY, id: count++ };
+
+        const addPoint = (x: number, y: number) => {
+            const newPoint = { x, y, id: count++ };
             setPoints((prev) => [...prev, newPoint].slice(-50)); // Keep last 50 points
 
             // Remove points after a short delay to create a tail effect
             setTimeout(() => {
                 setPoints((prev) => prev.filter((p) => p.id !== newPoint.id));
-            }, 600); // Slightly shorter trail
+            }, 600);
+        };
+
+        const handleMouseMove = (e: MouseEvent) => {
+            addPoint(e.clientX, e.clientY);
+        };
+
+        const handleTouchMove = (e: TouchEvent) => {
+            if (e.touches.length > 0) {
+                // Prevent default to separate scrolling from drawing if needed, 
+                // but usually we want to just track. 
+                // For a purely visual effect allowing scroll is often better unless it obstructs.
+                // Given "mouse trailing", likely want it to just follow.
+                const touch = e.touches[0];
+                addPoint(touch.clientX, touch.clientY);
+            }
         };
 
         window.addEventListener('mousemove', handleMouseMove);
-        return () => window.removeEventListener('mousemove', handleMouseMove);
+        window.addEventListener('touchmove', handleTouchMove);
+        window.addEventListener('touchstart', handleTouchMove); // Trigger on initial touch too
+
+        return () => {
+            window.removeEventListener('mousemove', handleMouseMove);
+            window.removeEventListener('touchmove', handleTouchMove);
+            window.removeEventListener('touchstart', handleTouchMove);
+        };
     }, []);
 
     if (points.length < 3) return null;
