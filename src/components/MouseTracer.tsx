@@ -28,25 +28,10 @@ export default function MouseTracer() {
             addPoint(e.clientX, e.clientY);
         };
 
-        const handleTouchMove = (e: TouchEvent) => {
-            if (e.touches.length > 0) {
-                // Prevent default to separate scrolling from drawing if needed, 
-                // but usually we want to just track. 
-                // For a purely visual effect allowing scroll is often better unless it obstructs.
-                // Given "mouse trailing", likely want it to just follow.
-                const touch = e.touches[0];
-                addPoint(touch.clientX, touch.clientY);
-            }
-        };
-
         window.addEventListener('mousemove', handleMouseMove);
-        window.addEventListener('touchmove', handleTouchMove);
-        window.addEventListener('touchstart', handleTouchMove); // Trigger on initial touch too
 
         return () => {
             window.removeEventListener('mousemove', handleMouseMove);
-            window.removeEventListener('touchmove', handleTouchMove);
-            window.removeEventListener('touchstart', handleTouchMove);
         };
     }, []);
 
