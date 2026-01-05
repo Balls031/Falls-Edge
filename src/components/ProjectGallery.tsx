@@ -140,10 +140,12 @@ function ProjectItem({ project, index }: { project: Project; index: number }) {
 
 
 
-                        {/* Price Tag Overlay */}
-                        <div className="absolute bottom-6 right-6 bg-black/70 text-white font-mono tracking-widest px-4 py-2 border border-white/30 backdrop-blur-sm z-10 text-sm md:text-base cursor-default">
-                            {project.specs.price || 'Inquire'}
-                        </div>
+                        {/* Price Tag Overlay - Hide if Sold */}
+                        {project.status !== 'sold' && (
+                            <div className="absolute bottom-6 right-6 bg-black/70 text-white font-mono tracking-widest px-4 py-2 border border-white/30 backdrop-blur-sm z-10 text-sm md:text-base cursor-default">
+                                {project.specs.price || 'Inquire'}
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

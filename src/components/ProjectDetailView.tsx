@@ -47,7 +47,7 @@ export default function ProjectDetailView({ project }: { project: Project }) {
 
                 {/* Status Stamp */}
                 {project.status !== 'available' && (
-                    <div className="absolute top-0 right-[40%] border-[6px] border-red-700/80 text-red-700/80 p-4 font-bold uppercase text-4xl -rotate-12 opacity-80 mix-blend-screen hidden md:block select-none pointer-events-none">
+                    <div className="absolute top-[80px] md:top-0 right-[10%] md:right-[40%] border-[6px] border-red-700/80 text-red-700/80 p-4 font-bold uppercase text-4xl -rotate-12 opacity-80 mix-blend-screen select-none pointer-events-none z-20">
                         <div className="border border-red-700/80 px-4 py-1">
                             {project.status}
                         </div>
@@ -104,11 +104,13 @@ export default function ProjectDetailView({ project }: { project: Project }) {
                     <div className="md:col-span-4 flex flex-col gap-8">
                         {/* Specs Grid (Compacted & Refactored) */}
                         <div className="flex flex-col gap-6">
-                            {/* Price - Centered Top */}
-                            <div className="text-center border-b border-blueprint-line pb-6">
-                                <span className="block text-4xl md:text-5xl text-white font-mono tracking-widest mb-1 md:mb-0 md:mt-2">{project.specs.price || 'Inquire'}</span>
-                                <span className="block text-gray-500 text-xs md:text-sm uppercase tracking-wider">Price</span>
-                            </div>
+                            {/* Price - Centered Top - Hide if Sold */}
+                            {project.status !== 'sold' && (
+                                <div className="text-center border-b border-blueprint-line pb-6">
+                                    <span className="block text-4xl md:text-5xl text-white font-mono tracking-widest mb-1 md:mb-0 md:mt-2">{project.specs.price || 'Inquire'}</span>
+                                    <span className="block text-gray-500 text-xs md:text-sm uppercase tracking-wider">Price</span>
+                                </div>
+                            )}
 
                             {/* Details Grid */}
                             <div className="grid grid-cols-2 gap-x-8 gap-y-4">
@@ -185,7 +187,7 @@ export default function ProjectDetailView({ project }: { project: Project }) {
                     )}
 
                     {tab === 'plans' && (
-                        <div className="space-y-8 animate-in fade-in zoom-in-95 duration-500">
+                        <div className="space-y-8">
                             {(project.blueprints || (project.blueprint ? [project.blueprint] : [])).map((plan, i) => (
                                 <div key={i} className="border border-blueprint-line relative bg-blueprint/50 overflow-hidden flex flex-col">
                                     <div className="relative w-full flex justify-center py-4">
