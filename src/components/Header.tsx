@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 
 export default function Header() {
@@ -10,15 +9,8 @@ export default function Header() {
 
     return (
         <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 pt-3 pb-3 md:px-12 md:py-6 bg-blueprint/80 backdrop-blur-md">
-            <Link href="/" className="relative h-10 w-auto hover:opacity-80 transition-opacity">
-                <Image
-                    src="/logo.png"
-                    alt="Falls Edge Logo"
-                    width={100}
-                    height={40}
-                    className="h-full w-auto object-contain"
-                    priority
-                />
+            <Link href="/" className="font-architect text-2xl md:text-3xl text-white tracking-widest hover:text-blueprint-accent transition-colors">
+                FALLS EDGE
             </Link>
 
             <nav>
