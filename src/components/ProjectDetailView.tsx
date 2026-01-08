@@ -65,29 +65,38 @@ export default function ProjectDetailView({ project }: { project: Project }) {
             </header>
 
             {/* Open House Banner */}
+            {/* Open House Banner */}
             {isSoon && (
-                <div className="w-full px-[40px] md:px-[80px] mb-8">
-                    <div className="bg-blueprint/40 border border-blueprint-accent/50 p-4 flex flex-col md:flex-row items-center justify-between gap-4 backdrop-blur-md relative overflow-hidden group">
-                        <div className="absolute top-0 right-0 w-20 h-20 bg-blueprint-accent/10 rounded-full blur-2xl group-hover:bg-blueprint-accent/20 transition-colors" />
+                <div className="w-full px-[40px] md:px-[80px] mb-8 animate-in slide-in-from-top-4 duration-700">
+                    <div className="bg-blueprint/40 border border-blueprint-accent/50 p-4 flex flex-col md:flex-row items-center justify-between gap-4 backdrop-blur-md relative overflow-hidden group hover:border-blueprint-accent transition-colors">
 
-                        <div className="flex items-center gap-4 z-10">
-                            <div className="bg-blueprint-accent text-black p-3 rounded-full">
+                        <div className="flex items-center gap-4 z-10 w-full md:w-auto">
+                            <div className="bg-blueprint-accent text-black p-3 rounded-full animate-pulse shrink-0">
                                 <Calendar size={24} />
                             </div>
                             <div>
-                                <h3 className="text-blueprint-accent font-bold uppercase tracking-widest text-sm">Open House Incoming</h3>
-                                <p className="text-white font-mono text-lg">
-                                    {nextOpenHouse.dateObj.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
-                                    <span className="mx-2 text-gray-500">|</span>
-                                    {nextOpenHouse.startTime} - {nextOpenHouse.endTime}
+                                <h3 className="text-blueprint-accent font-bold uppercase tracking-widest text-sm mb-1 animate-pulse">Open House Incoming</h3>
+                                <p className="text-white font-mono text-lg flex flex-col md:flex-row md:items-center gap-1 md:gap-2">
+                                    <span>{nextOpenHouse.dateObj.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</span>
+                                    <span className="hidden md:inline text-gray-500">|</span>
+                                    <span>
+                                        {(() => {
+                                            const [h, m] = nextOpenHouse.startTime.split(':');
+                                            const [endH, endM] = nextOpenHouse.endTime.split(':');
+                                            const date = new Date();
+                                            date.setHours(Number(h));
+                                            date.setMinutes(Number(m));
+                                            const startStr = date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+
+                                            date.setHours(Number(endH));
+                                            date.setMinutes(Number(endM));
+                                            const endStr = date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+
+                                            return `${startStr} - ${endStr} CT`;
+                                        })()}
+                                    </span>
                                 </p>
                             </div>
-                        </div>
-
-                        <div className="z-10">
-                            <span className="text-xs font-mono text-gray-400 uppercase border border-gray-600 px-3 py-1 rounded-full">
-                                Don't Miss It
-                            </span>
                         </div>
                     </div>
                 </div>

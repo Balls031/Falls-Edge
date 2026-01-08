@@ -513,11 +513,14 @@ export default function AdminPage() {
                                 {/* Open Houses */}
                                 <div className="p-4 border border-blueprint-line bg-white/5">
                                     <h3 className="text-xs uppercase text-blueprint-accent mb-3">Open Houses</h3>
-                                    <div className="flex gap-2 mb-2">
-                                        <input type="date" value={ohDate} onChange={e => setOhDate(e.target.value)} className="bg-black/40 border border-blueprint-line text-white p-2 text-xs" />
-                                        <input type="time" value={ohStart} onChange={e => setOhStart(e.target.value)} className="bg-black/40 border border-blueprint-line text-white p-2 text-xs" />
-                                        <input type="time" value={ohEnd} onChange={e => setOhEnd(e.target.value)} className="bg-black/40 border border-blueprint-line text-white p-2 text-xs" />
-                                        <button type="button" onClick={addOpenHouse} className="px-3 bg-blueprint-accent text-black font-bold text-xs uppercase hover:brightness-110">Add</button>
+                                    <div className="flex gap-2 mb-2 items-center">
+                                        <input type="date" value={ohDate} onChange={e => setOhDate(e.target.value)} className="bg-black/40 border border-blueprint-line text-white p-3 text-sm cursor-pointer" />
+                                        <div className="flex items-center gap-1">
+                                            <input type="time" value={ohStart} onChange={e => setOhStart(e.target.value)} className="bg-black/40 border border-blueprint-line text-white p-3 text-lg cursor-pointer appearance-none" />
+                                            <span className="text-white">-</span>
+                                            <input type="time" value={ohEnd} onChange={e => setOhEnd(e.target.value)} className="bg-black/40 border border-blueprint-line text-white p-3 text-lg cursor-pointer appearance-none" />
+                                        </div>
+                                        <button type="button" onClick={addOpenHouse} className="px-4 py-3 bg-blueprint-accent text-black font-bold text-xs uppercase hover:brightness-110">Add</button>
                                     </div>
                                     <div className="space-y-1">
                                         {openHouses.map((oh, i) => (
@@ -658,14 +661,14 @@ export default function AdminPage() {
                                             {p.status}
                                         </span>
                                         {p.scanCount && (
-                                            <div className="flex gap-2 items-center ml-2 border-l border-gray-700 pl-2">
-                                                <span className="text-[10px] text-gray-400 font-mono">
+                                            <div className="flex gap-3 items-center ml-4 border-l border-gray-700 pl-4">
+                                                <span className="text-sm text-gray-300 font-mono font-bold" title="Mobile Scans">
                                                     📱 {p.scanCount.mobile || 0}
                                                 </span>
-                                                <span className="text-[10px] text-gray-400 font-mono">
+                                                <span className="text-sm text-gray-300 font-mono font-bold" title="Desktop Scans">
                                                     🖥️ {p.scanCount.desktop || 0}
                                                 </span>
-                                                <button onClick={() => resetScans(p.id)} className="text-[10px] text-red-500 hover:text-white underline ml-1">Reset</button>
+                                                <button onClick={() => resetScans(p.id)} className="text-[10px] text-red-500 hover:text-white underline ml-1 uppercase tracking-wider">Reset</button>
                                             </div>
                                         )}
                                     </div>
