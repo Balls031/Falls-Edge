@@ -26,6 +26,8 @@ export type Project = {
     featured?: boolean;
     imageFit?: 'contain' | 'cover' | 'fill';
     qrCode?: string; // e.g. 'sign1', 'sign2'
+    scanCount?: { mobile: number; desktop: number };
+    openHouses?: { date: string; startTime: string; endTime: string }[];
 };
 
 export const PROJECTS: Project[] = [

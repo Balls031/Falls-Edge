@@ -70,6 +70,36 @@ export async function updateProject(project: Project): Promise<void> {
     }
 }
 
+export async function incrementProjectScan(id: string, device: 'mobile' | 'desktop'): Promise<void> {
+    // We can't do atomic updates easily on a JSONB field inside an array without a stored procedure 
+    // or careful logic. But here 'projects' is a table where one row = one project?
+    // Wait, the storage.ts suggests the 'projects' table has rows. 
+    // Let's check `getProjects`. It selects *. 
+    // If we assume Supabase, we can use an RPC or just read-modify-write for now (less safe but easier).
+    // Better: use an RPC if possible, but I don't have access to create RPCs easily without SQL tool (which I might have, but simple RMW is safer for now).
+
+    // Actually, let's fetch, update in memory, and save back.
+    const { data: project, error: fetchError } = await db
+        .from('projects')
+        .select('scanCount')
+        .eq('id', id)
+        .single();
+
+    if (fetchError || !project) return; // Silent fail?
+
+    const currentCounts = (project as any).scanCount || { mobile: 0, desktop: 0 };
+    currentCounts[device] = (currentCounts[device] || 0) + 1;
+
+    const { error } = await db
+        .from('projects')
+        .update({ scanCount: currentCounts })
+        .eq('id', id);
+
+    if (error) {
+        console.error('Error incrementing scan count:', error);
+    }
+}
+
 // --- Realtors ---
 
 export async function getRealtors(): Promise<any[]> {

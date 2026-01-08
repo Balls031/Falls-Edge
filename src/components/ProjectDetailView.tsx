@@ -6,7 +6,7 @@ import ContactCard from '@/components/ContactCard';
 import ProjectTabs from '@/components/ProjectTabs';
 import Lightbox from '@/components/Lightbox';
 import { useState } from 'react';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronDown, ChevronUp, Calendar } from 'lucide-react';
 
 export default function ProjectDetailView({ project }: { project: Project }) {
     const [tab, setTab] = useState<'photos' | 'plans'>('photos');
@@ -22,6 +22,15 @@ export default function ProjectDetailView({ project }: { project: Project }) {
         setPhotoIndex(index);
         setLightboxOpen(true);
     };
+
+    // Open House Logic
+    const sortedOpenHouses = project.openHouses
+        ?.map(oh => ({ ...oh, dateObj: new Date(`${oh.date}T${oh.startTime}`) }))
+        .filter(oh => oh.dateObj.getTime() > Date.now())
+        .sort((a, b) => a.dateObj.getTime() - b.dateObj.getTime());
+
+    const nextOpenHouse = sortedOpenHouses?.[0];
+    const isSoon = nextOpenHouse && (nextOpenHouse.dateObj.getTime() - Date.now() < 10 * 24 * 60 * 60 * 1000); // 10 days
 
     return (
         <main className="pt-20 pb-20 w-full max-w-[1340px] min-[2000px]:max-w-[1700px] mx-auto px-4 md:px-8 relative">
@@ -54,6 +63,35 @@ export default function ProjectDetailView({ project }: { project: Project }) {
                     </div>
                 )}
             </header>
+
+            {/* Open House Banner */}
+            {isSoon && (
+                <div className="w-full px-[40px] md:px-[80px] mb-8">
+                    <div className="bg-blueprint/40 border border-blueprint-accent/50 p-4 flex flex-col md:flex-row items-center justify-between gap-4 backdrop-blur-md relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 w-20 h-20 bg-blueprint-accent/10 rounded-full blur-2xl group-hover:bg-blueprint-accent/20 transition-colors" />
+
+                        <div className="flex items-center gap-4 z-10">
+                            <div className="bg-blueprint-accent text-black p-3 rounded-full">
+                                <Calendar size={24} />
+                            </div>
+                            <div>
+                                <h3 className="text-blueprint-accent font-bold uppercase tracking-widest text-sm">Open House Incoming</h3>
+                                <p className="text-white font-mono text-lg">
+                                    {nextOpenHouse.dateObj.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+                                    <span className="mx-2 text-gray-500">|</span>
+                                    {nextOpenHouse.startTime} - {nextOpenHouse.endTime}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="z-10">
+                            <span className="text-xs font-mono text-gray-400 uppercase border border-gray-600 px-3 py-1 rounded-full">
+                                Don't Miss It
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Main Content: Image (Left) & Details (Right) */}
             <section className="w-full px-[40px] md:px-[80px] mb-[60px]">

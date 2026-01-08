@@ -48,6 +48,10 @@ export default function AdminPage() {
     const [featured, setFeatured] = useState(false);
     const [imageFit, setImageFit] = useState<'contain' | 'cover' | 'fill'>('contain');
     const [qrCode, setQrCode] = useState('');
+    const [openHouses, setOpenHouses] = useState<{ date: string; startTime: string; endTime: string }[]>([]);
+    const [ohDate, setOhDate] = useState('');
+    const [ohStart, setOhStart] = useState('');
+    const [ohEnd, setOhEnd] = useState('');
 
     // Realtor State
     const [realtors, setRealtors] = useState<Realtor[]>([]);
@@ -220,6 +224,8 @@ export default function AdminPage() {
         setCurrentImageUrl(p.image || '');
         setGallery(p.gallery || []);
         setBlueprints(p.blueprints || (p.blueprint ? [p.blueprint] : []));
+        setOpenHouses(p.openHouses || []);
+
 
         // Realtor Loading Logic
         let ids: string[] = [];
@@ -253,6 +259,10 @@ export default function AdminPage() {
         setCurrentImageUrl('');
         setGallery([]);
         setBlueprints([]);
+        setOpenHouses([]);
+        setOhDate('');
+        setOhStart('');
+        setOhEnd('');
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -293,6 +303,7 @@ export default function AdminPage() {
                 featured,
                 imageFit,
                 qrCode,
+                openHouses,
                 realtors: realtors.filter(r => selectedRealtorIds.includes(r.id))
             };
 
@@ -327,6 +338,31 @@ export default function AdminPage() {
         await fetch(`/api/projects?id=${id}`, { method: 'DELETE' });
         fetchProjects();
         if (editingId === id) resetForm();
+    };
+
+    const addOpenHouse = () => {
+        if (!ohDate || !ohStart || !ohEnd) return alert('Fill all open house fields');
+        setOpenHouses([...openHouses, { date: ohDate, startTime: ohStart, endTime: ohEnd }]);
+        setOhDate(''); setOhStart(''); setOhEnd('');
+    };
+
+    const removeOpenHouse = (index: number) => {
+        setOpenHouses(openHouses.filter((_, i) => i !== index));
+    };
+
+    const resetScans = async (projectId: string) => {
+        if (!confirm('Reset scan counts for this project?')) return;
+        // We can do this by updating the project with 0 counts
+        const project = projects.find(p => p.id === projectId);
+        if (!project) return;
+
+        const updated = { ...project, scanCount: { mobile: 0, desktop: 0 } };
+        await fetch('/api/projects', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updated)
+        });
+        fetchProjects();
     };
 
 
@@ -474,6 +510,25 @@ export default function AdminPage() {
                                     <textarea id="description" name="description" value={description} onChange={e => setDescription(e.target.value)} className="w-full bg-black/20 border border-blueprint-line p-3 text-white focus:border-blueprint-accent outline-none h-32 font-mono text-sm" required />
                                 </div>
 
+                                {/* Open Houses */}
+                                <div className="p-4 border border-blueprint-line bg-white/5">
+                                    <h3 className="text-xs uppercase text-blueprint-accent mb-3">Open Houses</h3>
+                                    <div className="flex gap-2 mb-2">
+                                        <input type="date" value={ohDate} onChange={e => setOhDate(e.target.value)} className="bg-black/40 border border-blueprint-line text-white p-2 text-xs" />
+                                        <input type="time" value={ohStart} onChange={e => setOhStart(e.target.value)} className="bg-black/40 border border-blueprint-line text-white p-2 text-xs" />
+                                        <input type="time" value={ohEnd} onChange={e => setOhEnd(e.target.value)} className="bg-black/40 border border-blueprint-line text-white p-2 text-xs" />
+                                        <button type="button" onClick={addOpenHouse} className="px-3 bg-blueprint-accent text-black font-bold text-xs uppercase hover:brightness-110">Add</button>
+                                    </div>
+                                    <div className="space-y-1">
+                                        {openHouses.map((oh, i) => (
+                                            <div key={i} className="flex justify-between items-center bg-black/20 px-2 py-1 border border-blueprint-line/30">
+                                                <span className="text-white text-xs font-mono">{oh.date} | {oh.startTime} - {oh.endTime}</span>
+                                                <button type="button" onClick={() => removeOpenHouse(i)} className="text-red-500 hover:text-red-400 text-xs">X</button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                                     <input id="totalSqft" name="totalSqft" aria-label="Total SqFt" value={totalSqft} onChange={e => setTotalSqft(e.target.value)} className="w-full bg-black/20 border border-blueprint-line p-2 text-white font-mono" placeholder="Total SqFt" />
                                     <input id="finishedSqft" name="finishedSqft" aria-label="Finished SqFt" value={finishedSqft} onChange={e => setFinishedSqft(e.target.value)} className="w-full bg-black/20 border border-blueprint-line p-2 text-white font-mono" placeholder="Finished SqFt" />
@@ -602,6 +657,17 @@ export default function AdminPage() {
                                         <span className={`text-[10px] px-2 py-0.5 border ${p.status === 'sold' ? 'border-red-500 text-red-500' : 'border-green-500 text-green-500'} uppercase`}>
                                             {p.status}
                                         </span>
+                                        {p.scanCount && (
+                                            <div className="flex gap-2 items-center ml-2 border-l border-gray-700 pl-2">
+                                                <span className="text-[10px] text-gray-400 font-mono">
+                                                    📱 {p.scanCount.mobile || 0}
+                                                </span>
+                                                <span className="text-[10px] text-gray-400 font-mono">
+                                                    🖥️ {p.scanCount.desktop || 0}
+                                                </span>
+                                                <button onClick={() => resetScans(p.id)} className="text-[10px] text-red-500 hover:text-white underline ml-1">Reset</button>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             </div>
