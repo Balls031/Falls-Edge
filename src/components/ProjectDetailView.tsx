@@ -92,7 +92,7 @@ export default function ProjectDetailView({ project }: { project: Project }) {
                                             date.setMinutes(Number(endM));
                                             const endStr = date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
 
-                                            return `${startStr} - ${endStr} CT`;
+                                            return `${startStr} - ${endStr}`;
                                         })()}
                                     </span>
                                 </p>
@@ -213,7 +213,7 @@ export default function ProjectDetailView({ project }: { project: Project }) {
                 </div>
 
                 <div className="pt-10 min-h-[400px]">
-                    {tab === 'photos' && (
+                    <div className={tab === 'photos' ? 'block' : 'hidden'}>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-in fade-in duration-500">
                             {/* Gallery Grid (skipping main image if we want, but array usually doesn't include it so iterating gallery) */}
                             {project.gallery?.map((img, i) => (
@@ -231,9 +231,9 @@ export default function ProjectDetailView({ project }: { project: Project }) {
                                 </div>
                             ))}
                         </div>
-                    )}
+                    </div>
 
-                    {tab === 'plans' && (
+                    <div className={tab === 'plans' ? 'block' : 'hidden'}>
                         <div className="space-y-8">
                             {(project.blueprints || (project.blueprint ? [project.blueprint] : [])).map((plan, i) => (
                                 <div key={i} className="border border-blueprint-line relative bg-blueprint/50 overflow-hidden flex flex-col">
@@ -260,7 +260,7 @@ export default function ProjectDetailView({ project }: { project: Project }) {
                                 <div className="text-center text-gray-500 py-20 border border-dashed border-gray-800">No blueprints available.</div>
                             )}
                         </div>
-                    )}
+                    </div>
                 </div>
             </section >
 

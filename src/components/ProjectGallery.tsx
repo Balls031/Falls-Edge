@@ -119,24 +119,35 @@ function ProjectItem({ project, index }: { project: Project; index: number }) {
                             </button>
                         </div>
 
-                        <AnimatePresence mode="popLayout">
-                            <motion.div
-                                key={view}
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                exit={{ opacity: 0 }}
-                                transition={{ duration: 0.4 }}
-                                className="absolute inset-0 w-full h-full flex items-center justify-center bg-black/40"
+
+                        {/* Preload/Stack both images */}
+                        <div className="absolute inset-0 w-full h-full">
+                            {/* Photo View */}
+                            <div
+                                className={`absolute inset-0 w-full h-full transition-opacity duration-500 ease-in-out ${view === 'photo' ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
                             >
                                 <Link href={`/projects/${project.id}`} className="block w-full h-full">
                                     <img
-                                        src={view === 'photo' ? project.image : (project.blueprint || (project.blueprints && project.blueprints[0]) || '')}
+                                        src={project.image}
                                         alt={project.title}
-                                        className={`w-full h-full ${view === 'photo' && project.imageFit === 'cover' ? 'object-cover' : view === 'photo' && project.imageFit === 'fill' ? 'object-fill' : 'object-contain'}`}
+                                        className={`w-full h-full ${project.imageFit === 'cover' ? 'object-cover' : project.imageFit === 'fill' ? 'object-fill' : 'object-contain'}`}
                                     />
                                 </Link>
-                            </motion.div>
-                        </AnimatePresence>
+                            </div>
+
+                            {/* Plan View */}
+                            <div
+                                className={`absolute inset-0 w-full h-full bg-blueprint transition-opacity duration-500 ease-in-out ${view === 'blueprint' ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
+                            >
+                                <Link href={`/projects/${project.id}`} className="block w-full h-full flex items-center justify-center p-4">
+                                    <img
+                                        src={project.blueprint || (project.blueprints && project.blueprints[0]) || ''}
+                                        alt={`${project.title} Blueprint`}
+                                        className="w-full h-full object-contain"
+                                    />
+                                </Link>
+                            </div>
+                        </div>
 
 
 
