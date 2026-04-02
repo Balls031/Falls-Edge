@@ -65,42 +65,69 @@ export default function ProjectDetailView({ project }: { project: Project }) {
             </header>
 
             {/* Open House Banner */}
-            {/* Open House Banner */}
-            {isSoon && (
+            {isSoon && (() => {
+                const daysUntil = Math.ceil((nextOpenHouse.dateObj.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+                const isToday = daysUntil <= 0;
+                const isTomorrow = daysUntil === 1;
+                const urgencyLabel = isToday ? 'TODAY' : isTomorrow ? 'TOMORROW' : `IN ${daysUntil} DAYS`;
+
+                return (
                 <div className="w-full px-[40px] md:px-[80px] mb-8">
-                    <div className="bg-blueprint/40 border border-blueprint-accent/50 p-4 flex flex-col md:flex-row items-center justify-between gap-4 backdrop-blur-md relative overflow-hidden group hover:border-blueprint-accent transition-colors">
+                    <div className="relative border-2 border-blueprint-accent bg-gradient-to-r from-blueprint-accent/15 via-blueprint/60 to-blueprint-accent/15 p-6 md:p-8 backdrop-blur-lg overflow-hidden shadow-[0_0_30px_rgba(0,240,255,0.15)]">
+                        {/* Shimmer animation */}
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-blueprint-accent/5 to-transparent animate-[shimmer_3s_ease-in-out_infinite] pointer-events-none" />
 
-                        <div className="flex items-center gap-4 z-10 w-full md:w-auto">
-                            <div className="bg-blueprint-accent text-black p-3 rounded-full shrink-0">
-                                <Calendar size={24} />
-                            </div>
-                            <div>
-                                <h3 className="text-blueprint-accent font-bold uppercase tracking-widest text-sm mb-1">Open House Incoming</h3>
-                                <p className="text-white font-mono text-lg flex flex-col md:flex-row md:items-center gap-1 md:gap-2">
-                                    <span>{nextOpenHouse.dateObj.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</span>
-                                    <span className="hidden md:inline text-gray-500">|</span>
-                                    <span>
-                                        {(() => {
-                                            const [h, m] = nextOpenHouse.startTime.split(':');
-                                            const [endH, endM] = nextOpenHouse.endTime.split(':');
-                                            const date = new Date();
-                                            date.setHours(Number(h));
-                                            date.setMinutes(Number(m));
-                                            const startStr = date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+                        {/* Corner accents */}
+                        <div className="absolute top-0 left-0 w-6 h-6 border-t-[3px] border-l-[3px] border-blueprint-accent" />
+                        <div className="absolute top-0 right-0 w-6 h-6 border-t-[3px] border-r-[3px] border-blueprint-accent" />
+                        <div className="absolute bottom-0 left-0 w-6 h-6 border-b-[3px] border-l-[3px] border-blueprint-accent" />
+                        <div className="absolute bottom-0 right-0 w-6 h-6 border-b-[3px] border-r-[3px] border-blueprint-accent" />
 
-                                            date.setHours(Number(endH));
-                                            date.setMinutes(Number(endM));
-                                            const endStr = date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+                        <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
+                            {/* Left: Icon + Details */}
+                            <div className="flex items-center gap-5">
+                                {/* Pulsing icon */}
+                                <div className="relative shrink-0">
+                                    <div className="absolute inset-0 bg-blueprint-accent/30 rounded-full animate-ping" />
+                                    <div className="relative bg-blueprint-accent text-black p-4 rounded-full">
+                                        <Calendar size={28} />
+                                    </div>
+                                </div>
 
-                                            return `${startStr} - ${endStr}`;
-                                        })()}
-                                    </span>
-                                </p>
+                                <div>
+                                    <div className="flex items-center gap-3 mb-2">
+                                        <h3 className="text-blueprint-accent font-bold uppercase tracking-[0.2em] text-base md:text-lg">Open House</h3>
+                                        <span className={`text-[10px] md:text-xs font-bold uppercase tracking-widest px-2 py-0.5 border ${isToday ? 'bg-red-500/20 text-red-400 border-red-500/50 animate-pulse' : isTomorrow ? 'bg-amber-500/20 text-amber-400 border-amber-500/50' : 'bg-blueprint-accent/10 text-blueprint-accent border-blueprint-accent/30'}`}>
+                                            {urgencyLabel}
+                                        </span>
+                                    </div>
+                                    <p className="text-white font-mono text-xl md:text-2xl flex flex-col md:flex-row md:items-center gap-1 md:gap-3">
+                                        <span className="font-bold">{nextOpenHouse.dateObj.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</span>
+                                        <span className="hidden md:inline text-blueprint-accent/50">|</span>
+                                        <span className="text-blueprint-accent">
+                                            {(() => {
+                                                const [h, m] = nextOpenHouse.startTime.split(':');
+                                                const [endH, endM] = nextOpenHouse.endTime.split(':');
+                                                const date = new Date();
+                                                date.setHours(Number(h));
+                                                date.setMinutes(Number(m));
+                                                const startStr = date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+
+                                                date.setHours(Number(endH));
+                                                date.setMinutes(Number(endM));
+                                                const endStr = date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+
+                                                return `${startStr} – ${endStr}`;
+                                            })()}
+                                        </span>
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            )}
+                );
+            })()}
 
             {/* Main Content: Image (Left) & Details (Right) */}
             <section className="w-full px-[40px] md:px-[80px] mb-[60px]">
