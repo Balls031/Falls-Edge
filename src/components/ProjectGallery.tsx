@@ -160,7 +160,7 @@ function ProjectItem({ project, index }: { project: Project; index: number }) {
 
                         {/* Open House Badge */}
                         {hasUpcomingOpenHouse && (
-                            <div className="absolute top-4 left-4 z-20 flex items-center gap-2 bg-blueprint-accent/90 text-black px-3 py-1.5 font-bold uppercase text-[10px] md:text-xs tracking-widest backdrop-blur-sm shadow-[0_0_15px_rgba(0,240,255,0.4)] animate-pulse">
+                            <div className="absolute top-4 left-4 z-20 flex items-center gap-2 bg-blueprint-accent/90 text-black px-3 py-1.5 font-bold uppercase text-[10px] md:text-xs tracking-widest backdrop-blur-sm shadow-[0_0_15px_rgba(0,240,255,0.4)]">
                                 <span className="w-2 h-2 bg-black rounded-full" />
                                 OPEN HOUSE
                             </div>

@@ -83,28 +83,27 @@ export default function ProjectDetailView({ project }: { project: Project }) {
                         <div className="absolute bottom-0 left-0 w-6 h-6 border-b-[3px] border-l-[3px] border-blueprint-accent" />
                         <div className="absolute bottom-0 right-0 w-6 h-6 border-b-[3px] border-r-[3px] border-blueprint-accent" />
 
-                        <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
-                            {/* Left: Icon + Details */}
-                            <div className="flex items-center gap-5">
-                                {/* Pulsing icon */}
-                                <div className="relative shrink-0">
-                                    <div className="absolute inset-0 bg-blueprint-accent/30 rounded-full animate-ping" />
-                                    <div className="relative bg-blueprint-accent text-black p-4 rounded-full">
-                                        <Calendar size={28} />
+                        <div className="relative z-10 flex flex-col gap-4">
+                            {/* Icon + Details */}
+                            <div className="flex items-start gap-3 md:gap-5">
+                                {/* Calendar icon - smaller on mobile, no ping */}
+                                <div className="relative shrink-0 mt-0.5">
+                                    <div className="bg-blueprint-accent text-black p-2.5 md:p-4 rounded-full">
+                                        <Calendar size={20} className="md:hidden" />
+                                        <Calendar size={28} className="hidden md:block" />
                                     </div>
                                 </div>
 
-                                <div>
-                                    <div className="flex items-center gap-3 mb-2">
-                                        <h3 className="text-blueprint-accent font-bold uppercase tracking-[0.2em] text-base md:text-lg">Open House</h3>
-                                        <span className={`text-[10px] md:text-xs font-bold uppercase tracking-widest px-2 py-0.5 border ${isToday ? 'bg-red-500/20 text-red-400 border-red-500/50 animate-pulse' : isTomorrow ? 'bg-amber-500/20 text-amber-400 border-amber-500/50' : 'bg-blueprint-accent/10 text-blueprint-accent border-blueprint-accent/30'}`}>
+                                <div className="min-w-0 flex-1">
+                                    <div className="flex flex-wrap items-center gap-2 md:gap-3 mb-1.5 md:mb-2">
+                                        <h3 className="text-blueprint-accent font-bold uppercase tracking-[0.15em] md:tracking-[0.2em] text-sm md:text-lg">Open House</h3>
+                                        <span className={`text-[9px] md:text-xs font-bold uppercase tracking-widest px-1.5 md:px-2 py-0.5 border whitespace-nowrap ${isToday ? 'bg-red-500/20 text-red-400 border-red-500/50 animate-pulse' : isTomorrow ? 'bg-amber-500/20 text-amber-400 border-amber-500/50' : 'bg-blueprint-accent/10 text-blueprint-accent border-blueprint-accent/30'}`}>
                                             {urgencyLabel}
                                         </span>
                                     </div>
-                                    <p className="text-white font-mono text-xl md:text-2xl flex flex-col md:flex-row md:items-center gap-1 md:gap-3">
-                                        <span className="font-bold">{nextOpenHouse.dateObj.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</span>
-                                        <span className="hidden md:inline text-blueprint-accent/50">|</span>
-                                        <span className="text-blueprint-accent">
+                                    <p className="text-white font-mono text-base md:text-2xl flex flex-col gap-0.5 md:gap-0">
+                                        <span className="font-bold leading-tight">{nextOpenHouse.dateObj.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</span>
+                                        <span className="text-blueprint-accent text-sm md:text-xl">
                                             {(() => {
                                                 const [h, m] = nextOpenHouse.startTime.split(':');
                                                 const [endH, endM] = nextOpenHouse.endTime.split(':');
