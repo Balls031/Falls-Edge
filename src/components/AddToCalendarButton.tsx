@@ -16,12 +16,20 @@ interface CalendarEvent {
 
 /**
  * Resolve the best location string for calendar events.
- * Priority: address > formatted coordinates > fallback location name.
+ * Priority: address > fallback location name.
  */
 function resolveLocation(event: CalendarEvent): string {
     if (event.address) return event.address;
-    if (event.coordinates) return `${event.coordinates.lat}, ${event.coordinates.lng}`;
     return event.location;
+}
+
+function buildDescription(event: CalendarEvent): string {
+    const loc = resolveLocation(event);
+    let desc = `Open House at ${event.title}\n${loc}\nHosted by Falls Edge Construction`;
+    if (!event.address && event.coordinates) {
+        desc += `\n\nMap Navigation: https://maps.google.com/?q=${event.coordinates.lat},${event.coordinates.lng}`;
+    }
+    return desc;
 }
 
 function toGoogleDate(date: string, time: string): string {
@@ -37,7 +45,7 @@ function buildGoogleCalendarUrl(event: CalendarEvent): string {
         action: 'TEMPLATE',
         text: `Open House – ${event.title}`,
         dates: `${toGoogleDate(event.date, event.startTime)}/${toGoogleDate(event.date, event.endTime)}`,
-        details: `Open House at ${event.title}\n${loc}\nHosted by Falls Edge Construction`,
+        details: buildDescription(event),
         location: loc,
     });
     return `https://calendar.google.com/calendar/render?${params.toString()}`;
@@ -53,7 +61,7 @@ function buildOutlookUrl(event: CalendarEvent): string {
         subject: `Open House – ${event.title}`,
         startdt: startDt,
         enddt: endDt,
-        body: `Open House at ${event.title}\n${loc}\nHosted by Falls Edge Construction`,
+        body: buildDescription(event),
         location: loc,
     });
     return `https://outlook.live.com/calendar/0/action/compose?${params.toString()}`;
@@ -68,7 +76,7 @@ function buildYahooUrl(event: CalendarEvent): string {
         title: `Open House – ${event.title}`,
         st,
         et,
-        desc: `Open House at ${event.title}\n${loc}\nHosted by Falls Edge Construction`,
+        desc: buildDescription(event),
         in_loc: loc,
     });
     return `https://calendar.yahoo.com/?${params.toString()}`;
@@ -97,7 +105,7 @@ function buildAppleIcsContent(event: CalendarEvent): string {
         `DTSTAMP:${stamp}`,
         `UID:openhouse-${event.date}@fallsedge.com`,
         `SUMMARY:Open House – ${event.title}`,
-        `DESCRIPTION:Open House at ${event.title}\\n${loc}\\nHosted by Falls Edge Construction`,
+        `DESCRIPTION:${buildDescription(event).replace(/\n/g, '\\n')}`,
         `LOCATION:${loc}`,
         'STATUS:CONFIRMED',
     ];
