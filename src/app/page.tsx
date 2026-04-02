@@ -25,6 +25,8 @@ export default async function Home() {
           id: p.id,
           title: p.title,
           location: p.location,
+          address: p.address,
+          coordinates: p.coordinates,
           openHouse: oh,
         }))
     )

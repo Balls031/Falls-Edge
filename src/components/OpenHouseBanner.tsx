@@ -3,12 +3,15 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { Calendar, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
+import AddToCalendarButton from './AddToCalendarButton';
 
 interface OpenHouseProject {
     id: string;
     title: string;
     location: string;
+    address?: string;
+    coordinates?: { lat: number; lng: number };
     openHouse: {
         date: string;
         startTime: string;
@@ -39,59 +42,7 @@ function getDaysUntil(dateObj: Date | string): number {
     return Math.round(diffMs / (1000 * 60 * 60 * 24));
 }
 
-function pad2(n: number) {
-    return n.toString().padStart(2, '0');
-}
 
-function toICSDateLocal(dateStr: string, timeStr: string): string {
-    // dateStr = "2026-04-05", timeStr = "10:00"
-    // Returns: 20260405T100000
-    const [y, m, d] = dateStr.split('-');
-    const [h, min] = timeStr.split(':');
-    return `${y}${pad2(Number(m))}${pad2(Number(d))}T${pad2(Number(h))}${pad2(Number(min))}00`;
-}
-
-function downloadICS(project: OpenHouseProject) {
-    const { title, location, openHouse } = project;
-    const dtStart = toICSDateLocal(openHouse.date, openHouse.startTime);
-    const dtEnd = toICSDateLocal(openHouse.date, openHouse.endTime);
-    const now = new Date();
-    const stamp = `${now.getUTCFullYear()}${pad2(now.getUTCMonth() + 1)}${pad2(now.getUTCDate())}T${pad2(now.getUTCHours())}${pad2(now.getUTCMinutes())}${pad2(now.getUTCSeconds())}Z`;
-
-    const ics = [
-        'BEGIN:VCALENDAR',
-        'VERSION:2.0',
-        'PRODID:-//Falls Edge Construction//Open House//EN',
-        'CALSCALE:GREGORIAN',
-        'METHOD:PUBLISH',
-        'BEGIN:VEVENT',
-        `DTSTART:${dtStart}`,
-        `DTEND:${dtEnd}`,
-        `DTSTAMP:${stamp}`,
-        `UID:openhouse-${project.id}-${openHouse.date}@fallsedge.com`,
-        `SUMMARY:Open House - ${title}`,
-        `DESCRIPTION:Open House at ${title}\\n${location}\\nHosted by Falls Edge Construction`,
-        `LOCATION:${location}`,
-        'STATUS:CONFIRMED',
-        'BEGIN:VALARM',
-        'TRIGGER:-PT1H',
-        'ACTION:DISPLAY',
-        'DESCRIPTION:Open House in 1 hour',
-        'END:VALARM',
-        'END:VEVENT',
-        'END:VCALENDAR',
-    ].join('\r\n');
-
-    const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `Open_House_${title.replace(/\s+/g, '_')}.ics`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-}
 
 export default function OpenHouseBanner({ projects }: { projects: OpenHouseProject[] }) {
     // Force re-render every 60s so the urgency label stays current (e.g. at midnight)
@@ -133,21 +84,19 @@ export default function OpenHouseBanner({ projects }: { projects: OpenHouseProje
                                     <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                                         {/* Left: Icon + Details */}
                                         <div className="flex items-center gap-4 md:gap-5">
-                                            {/* Pulsing calendar icon — click to add to calendar */}
-                                            <button
-                                                onClick={(e) => {
-                                                    e.preventDefault();
-                                                    e.stopPropagation();
-                                                    downloadICS(project);
+                                            {/* Calendar dropdown — add to preferred calendar */}
+                                            <AddToCalendarButton
+                                                event={{
+                                                    title: project.title,
+                                                    location: project.location,
+                                                    date: project.openHouse.date,
+                                                    startTime: project.openHouse.startTime,
+                                                    endTime: project.openHouse.endTime,
+                                                    address: project.address,
+                                                    coordinates: project.coordinates,
                                                 }}
-                                                title="Add to Calendar"
-                                                className="relative shrink-0 cursor-pointer group/cal"
-                                            >
-                                                <div className="absolute inset-0 bg-blueprint-accent/30 rounded-full animate-ping" />
-                                                <div className="relative bg-blueprint-accent text-black p-3 md:p-4 rounded-full group-hover/cal:bg-white group-hover/cal:scale-110 transition-all duration-200">
-                                                    <Calendar size={22} />
-                                                </div>
-                                            </button>
+                                                size="sm"
+                                            />
 
                                             <div>
                                                 <div className="flex items-center gap-3 mb-1">

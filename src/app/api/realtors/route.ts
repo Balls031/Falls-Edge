@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getRealtors, addRealtor, deleteRealtor, updateRealtor } from '@/lib/storage';
+import { getRealtors, addRealtor, deleteRealtor, updateRealtor, updateRealtorInProjects } from '@/lib/storage';
 import { Realtor } from '@/lib/data';
 
 export async function GET() {
@@ -30,6 +30,15 @@ export async function PUT(request: Request) {
         }
 
         await updateRealtor(body as Realtor);
+
+        // Auto-sync: push updated realtor data into all projects that reference this realtor
+        try {
+            await updateRealtorInProjects(body as Realtor);
+        } catch (syncError) {
+            console.error('Warning: Realtor saved but project sync failed:', syncError);
+            // Don't fail the request — the realtor itself was saved successfully
+        }
+
         return NextResponse.json({ success: true });
     } catch (error) {
         console.error('API Error:', error);

@@ -159,3 +159,36 @@ export async function updateRealtor(realtor: any): Promise<void> {
         throw error;
     }
 }
+
+/**
+ * After editing a realtor, update the embedded realtor snapshot
+ * inside every project that references this realtor (by ID).
+ * This eliminates the need to remove and re-add realtors from listings.
+ */
+export async function updateRealtorInProjects(realtor: any): Promise<void> {
+    const projects = await getProjects();
+    const updates: Project[] = [];
+
+    for (const project of projects) {
+        if (!project.realtors?.length) continue;
+        const idx = project.realtors.findIndex((r: any) => r.id === realtor.id);
+        if (idx === -1) continue;
+
+        // Replace the old snapshot with the fresh realtor data
+        const updatedRealtors = [...project.realtors];
+        updatedRealtors[idx] = { ...realtor };
+        updates.push({ ...project, realtors: updatedRealtors });
+    }
+
+    // Batch update all affected projects
+    for (const project of updates) {
+        const { error } = await db
+            .from('projects')
+            .update({ realtors: project.realtors })
+            .eq('id', project.id);
+
+        if (error) {
+            console.error(`Error syncing realtor into project ${project.id}:`, error);
+        }
+    }
+}

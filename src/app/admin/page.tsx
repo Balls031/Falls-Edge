@@ -48,6 +48,9 @@ export default function AdminPage() {
     const [featured, setFeatured] = useState(false);
     const [imageFit, setImageFit] = useState<'contain' | 'cover' | 'fill'>('contain');
     const [qrCode, setQrCode] = useState('');
+    const [address, setAddress] = useState('');
+    const [coordLat, setCoordLat] = useState('');
+    const [coordLng, setCoordLng] = useState('');
     const [openHouses, setOpenHouses] = useState<{ date: string; startTime: string; endTime: string }[]>([]);
     const [ohDate, setOhDate] = useState('');
     const [ohStart, setOhStart] = useState('');
@@ -259,6 +262,9 @@ export default function AdminPage() {
         setFeatured(p.featured || false);
         setImageFit((p.imageFit as any) || 'contain');
         setQrCode(p.qrCode || '');
+        setAddress(p.address || '');
+        setCoordLat(p.coordinates?.lat?.toString() || '');
+        setCoordLng(p.coordinates?.lng?.toString() || '');
         setCurrentImageUrl(p.image || '');
         setGallery(p.gallery || []);
         setBlueprints(p.blueprints || (p.blueprint ? [p.blueprint] : []));
@@ -292,6 +298,9 @@ export default function AdminPage() {
         setFeatured(false);
         setImageFit('contain');
         setQrCode('');
+        setAddress('');
+        setCoordLat('');
+        setCoordLng('');
         setSelectedRealtorIds([]);
         setImageFile(null);
         setCurrentImageUrl('');
@@ -341,6 +350,8 @@ export default function AdminPage() {
                 featured,
                 imageFit,
                 qrCode,
+                address: address || undefined,
+                coordinates: (coordLat && coordLng) ? { lat: parseFloat(coordLat), lng: parseFloat(coordLng) } : undefined,
                 openHouses,
                 realtors: realtors.filter(r => selectedRealtorIds.includes(r.id))
             };
@@ -593,6 +604,28 @@ export default function AdminPage() {
                                 <div>
                                     <label htmlFor="description" className="block text-[10px] uppercase text-gray-500 mb-2">Description</label>
                                     <textarea id="description" name="description" value={description} onChange={e => setDescription(e.target.value)} className="w-full bg-black/20 border border-blueprint-line p-3 text-white focus:border-blueprint-accent outline-none h-32 font-mono text-sm" required />
+                                </div>
+
+                                {/* Address & Coordinates for Calendar / Maps Navigation */}
+                                <div className="p-4 border border-blueprint-line bg-white/5">
+                                    <h3 className="text-xs uppercase text-blueprint-accent mb-3">Address / Coordinates <span className="text-gray-500 normal-case">(for calendar &amp; map links)</span></h3>
+                                    <div className="space-y-3">
+                                        <div>
+                                            <label htmlFor="address" className="block text-[10px] uppercase text-gray-500 mb-1">Street Address</label>
+                                            <input id="address" name="address" value={address} onChange={e => setAddress(e.target.value)} className="w-full bg-black/40 border border-blueprint-line p-3 text-white font-mono text-sm focus:border-blueprint-accent outline-none" placeholder="e.g. 1234 Falls Edge Dr, Sioux Falls, SD 57108" />
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-3">
+                                            <div>
+                                                <label htmlFor="coordLat" className="block text-[10px] uppercase text-gray-500 mb-1">Latitude <span className="text-gray-600 normal-case">(optional)</span></label>
+                                                <input id="coordLat" name="coordLat" type="number" step="any" value={coordLat} onChange={e => setCoordLat(e.target.value)} className="w-full bg-black/40 border border-blueprint-line p-3 text-white font-mono text-sm focus:border-blueprint-accent outline-none" placeholder="e.g. 43.5460" />
+                                            </div>
+                                            <div>
+                                                <label htmlFor="coordLng" className="block text-[10px] uppercase text-gray-500 mb-1">Longitude <span className="text-gray-600 normal-case">(optional)</span></label>
+                                                <input id="coordLng" name="coordLng" type="number" step="any" value={coordLng} onChange={e => setCoordLng(e.target.value)} className="w-full bg-black/40 border border-blueprint-line p-3 text-white font-mono text-sm focus:border-blueprint-accent outline-none" placeholder="e.g. -96.7313" />
+                                            </div>
+                                        </div>
+                                        <p className="text-[10px] text-gray-600">Address is used for calendar event locations. For new construction without a street address, use GPS coordinates — Google &amp; Apple Maps can navigate to them directly.</p>
+                                    </div>
                                 </div>
 
                                 {/* Open Houses */}

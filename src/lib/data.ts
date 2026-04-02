@@ -26,6 +26,8 @@ export type Project = {
     featured?: boolean;
     imageFit?: 'contain' | 'cover' | 'fill';
     qrCode?: string; // e.g. 'sign1', 'sign2'
+    address?: string; // Full street address for calendar/maps navigation
+    coordinates?: { lat: number; lng: number }; // GPS coordinates for new construction
     scanCount?: { mobile: number; desktop: number };
     openHouses?: { date: string; startTime: string; endTime: string }[];
 };
