@@ -1,0 +1,144 @@
+[
+  {
+    "id": "1",
+    "projectNumber": "",
+    "title": "The Highland",
+    "location": "Falls Edge, Sioux Falls",
+    "description": "A modern ranch layout featuring vaulted ceilings and an expansive covered deck.",
+    "image": "https://images.unsplash.com/photo-1580587771525-78b9dba3b91d?auto=format&fit=crop&q=80",
+    "blueprint": "https://images.unsplash.com/photo-1581094285065-2bc2e9432822?auto=format&fit=crop&q=80",
+    "blueprints": [
+      "https://images.unsplash.com/photo-1581094285065-2bc2e9432822?auto=format&fit=crop&q=80"
+    ],
+    "gallery": [
+      "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c",
+      "https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea",
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c"
+    ],
+    "specs": {
+      "totalSqft": "3100",
+      "finishedSqft": "3000",
+      "unfinishedSqft": "100",
+      "bed": 4,
+      "bath": 3,
+      "price": "$645,000"
+    },
+    "status": "available",
+    "featured": true
+  },
+  {
+    "id": "2",
+    "title": "The Summit",
+    "location": "Willow Ridge, Hartford",
+    "description": "Split-foyer design optimizing space and natural light with lower-level walkout.",
+    "image": "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&q=80",
+    "blueprint": "https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&q=80",
+    "gallery": [
+      "https://images.unsplash.com/photo-1600566752355-35792bedcfe1",
+      "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0"
+    ],
+    "specs": {
+      "totalSqft": "2,400",
+      "heatedSqft": "1,200",
+      "basement": "1,200 (Partially Fin.)",
+      "bed": 3,
+      "bath": 2.5,
+      "price": "$525,000"
+    },
+    "status": "sold"
+  },
+  {
+    "id": "1767414790504",
+    "projectNumber": "123",
+    "title": "123",
+    "location": "123",
+    "description": "test",
+    "image": "/uploads/1767414790195-PXL_20251217_224139474.jpg",
+    "blueprint": "/uploads/1767414790500-PXL_20251217_224211931.jpg",
+    "blueprints": [
+      "/uploads/1767414790500-PXL_20251217_224211931.jpg"
+    ],
+    "gallery": [
+      "/uploads/1767414771679-PXL_20251217_224211931.jpg",
+      "/uploads/1767414771688-PXL_20251217_224100537.jpg",
+      "/uploads/1767414771692-PXL_20251217_224139474.jpg",
+      "/uploads/1767414771773-PXL_20251217_224052579.jpg"
+    ],
+    "specs": {
+      "totalSqft": "4000",
+      "finishedSqft": "3000",
+      "unfinishedSqft": "1000",
+      "bed": 1,
+      "bath": 2,
+      "garage": "9",
+      "price": "$1000000"
+    },
+    "status": "pending",
+    "featured": true,
+    "imageFit": "cover",
+    "qrCode": "sign999",
+    "realtors": [
+      {
+        "id": "1767474723924",
+        "name": "David Zimmer",
+        "phone": "60512345678",
+        "title": "Project Manager",
+        "email": "",
+        "agency": "Hello test",
+        "image": ""
+      }
+    ]
+  },
+  {
+    "id": "1767418760809",
+    "projectNumber": "321",
+    "title": "Arlo",
+    "location": "Heartford",
+    "description": "A seemingly endless array of enticing amenities are found in this 1-story, Craftsman-style house plan. A covered front stoop welcomes guests.",
+    "image": "/uploads/1767419918718-62744DJ_0_1541625142.jpg",
+    "blueprint": "/uploads/1767469550767-Gemini_Generated_Image_mcf65pmcf65pmcf6.jpg",
+    "blueprints": [
+      "/uploads/1767469550767-Gemini_Generated_Image_mcf65pmcf65pmcf6.jpg",
+      "/uploads/1767469567878-62744DJ_F1_1541625140.jpg"
+    ],
+    "gallery": [
+      "/uploads/1767419916823-62744DJ_0_1541625142.jpg",
+      "/uploads/1767419916857-62744DJ_render_001_1645653863.jpg",
+      "/uploads/1767419916926-62744DJ_render_002_1645653865.jpg",
+      "/uploads/1767419916980-62744DJ_render_004_1645653866.jpg"
+    ],
+    "specs": {
+      "totalSqft": "4000",
+      "finishedSqft": "3000",
+      "unfinishedSqft": "1000",
+      "bed": 3,
+      "bath": 2.5,
+      "garage": "3+",
+      "price": "$375,000"
+    },
+    "status": "available",
+    "featured": true,
+    "imageFit": "cover",
+    "qrCode": "1",
+    "realtors": [
+      {
+        "id": "1767472091060",
+        "name": "Elliott",
+        "phone": "60512345678",
+        "title": "Project Manager",
+        "email": "",
+        "agency": "",
+        "image": "/uploads/1767472502766-62744DJ_render_001_1645653863.jpg"
+      },
+      {
+        "id": "1767474723924",
+        "name": "David Zimmer",
+        "phone": "60512345678",
+        "title": "Project Manager",
+        "email": "",
+        "agency": "Hello test",
+        "image": ""
+      }
+    ]
+  }
+]
