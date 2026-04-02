@@ -5,14 +5,76 @@ import { Project } from '@/lib/data';
 import ContactCard from '@/components/ContactCard';
 import ProjectTabs from '@/components/ProjectTabs';
 import Lightbox from '@/components/Lightbox';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ChevronDown, ChevronUp, Calendar } from 'lucide-react';
+
+function getDaysUntilCalendar(dateObj: Date): number {
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const target = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate());
+    return Math.round((target.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+}
+
+function pad2(n: number) {
+    return n.toString().padStart(2, '0');
+}
+
+function downloadICS(title: string, location: string, date: string, startTime: string, endTime: string, id: string) {
+    const [y, m, d] = date.split('-');
+    const [sh, sm] = startTime.split(':');
+    const [eh, em] = endTime.split(':');
+    const dtStart = `${y}${pad2(Number(m))}${pad2(Number(d))}T${pad2(Number(sh))}${pad2(Number(sm))}00`;
+    const dtEnd = `${y}${pad2(Number(m))}${pad2(Number(d))}T${pad2(Number(eh))}${pad2(Number(em))}00`;
+    const now = new Date();
+    const stamp = `${now.getUTCFullYear()}${pad2(now.getUTCMonth() + 1)}${pad2(now.getUTCDate())}T${pad2(now.getUTCHours())}${pad2(now.getUTCMinutes())}${pad2(now.getUTCSeconds())}Z`;
+
+    const ics = [
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//Falls Edge Construction//Open House//EN',
+        'CALSCALE:GREGORIAN',
+        'METHOD:PUBLISH',
+        'BEGIN:VEVENT',
+        `DTSTART:${dtStart}`,
+        `DTEND:${dtEnd}`,
+        `DTSTAMP:${stamp}`,
+        `UID:openhouse-${id}-${date}@fallsedge.com`,
+        `SUMMARY:Open House - ${title}`,
+        `DESCRIPTION:Open House at ${title}\\n${location}\\nHosted by Falls Edge Construction`,
+        `LOCATION:${location}`,
+        'STATUS:CONFIRMED',
+        'BEGIN:VALARM',
+        'TRIGGER:-PT1H',
+        'ACTION:DISPLAY',
+        'DESCRIPTION:Open House in 1 hour',
+        'END:VALARM',
+        'END:VEVENT',
+        'END:VCALENDAR',
+    ].join('\r\n');
+
+    const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Open_House_${title.replace(/\s+/g, '_')}.ics`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
 
 export default function ProjectDetailView({ project }: { project: Project }) {
     const [tab, setTab] = useState<'photos' | 'plans'>('photos');
     const [lightboxOpen, setLightboxOpen] = useState(false);
     const [photoIndex, setPhotoIndex] = useState(0);
     const [isNarrativeOpen, setIsNarrativeOpen] = useState(false);
+
+    // Force re-render every 60s so the urgency label stays current (e.g. at midnight)
+    const [, setTick] = useState(0);
+    useEffect(() => {
+        const interval = setInterval(() => setTick((t: number) => t + 1), 60_000);
+        return () => clearInterval(interval);
+    }, []);
 
     const galleryPhotos = (project.gallery && project.gallery.length > 0) ? project.gallery : [project.image];
     const blueprints = project.blueprints || (project.blueprint ? [project.blueprint] : []);
@@ -66,7 +128,7 @@ export default function ProjectDetailView({ project }: { project: Project }) {
 
             {/* Open House Banner */}
             {isSoon && (() => {
-                const daysUntil = Math.ceil((nextOpenHouse.dateObj.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+                const daysUntil = getDaysUntilCalendar(nextOpenHouse.dateObj);
                 const isToday = daysUntil <= 0;
                 const isTomorrow = daysUntil === 1;
                 const urgencyLabel = isToday ? 'TODAY' : isTomorrow ? 'TOMORROW' : `IN ${daysUntil} DAYS`;
@@ -86,13 +148,24 @@ export default function ProjectDetailView({ project }: { project: Project }) {
                         <div className="relative z-10 flex flex-col gap-4">
                             {/* Icon + Details */}
                             <div className="flex items-start gap-3 md:gap-5">
-                                {/* Calendar icon - smaller on mobile, no ping */}
-                                <div className="relative shrink-0 mt-0.5">
-                                    <div className="bg-blueprint-accent text-black p-2.5 md:p-4 rounded-full">
+                                {/* Calendar icon — click to add to calendar */}
+                                <button
+                                    onClick={() => downloadICS(
+                                        project.title,
+                                        project.location,
+                                        nextOpenHouse.date,
+                                        nextOpenHouse.startTime,
+                                        nextOpenHouse.endTime,
+                                        project.id
+                                    )}
+                                    title="Add to Calendar"
+                                    className="relative shrink-0 mt-0.5 cursor-pointer group/cal"
+                                >
+                                    <div className="bg-blueprint-accent text-black p-2.5 md:p-4 rounded-full group-hover/cal:bg-white group-hover/cal:scale-110 transition-all duration-200">
                                         <Calendar size={20} className="md:hidden" />
                                         <Calendar size={28} className="hidden md:block" />
                                     </div>
-                                </div>
+                                </button>
 
                                 <div className="min-w-0 flex-1">
                                     <div className="flex flex-wrap items-center gap-2 md:gap-3 mb-1.5 md:mb-2">

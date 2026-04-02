@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { Calendar, ArrowRight } from 'lucide-react';
@@ -93,6 +94,13 @@ function downloadICS(project: OpenHouseProject) {
 }
 
 export default function OpenHouseBanner({ projects }: { projects: OpenHouseProject[] }) {
+    // Force re-render every 60s so the urgency label stays current (e.g. at midnight)
+    const [, setTick] = useState(0);
+    useEffect(() => {
+        const interval = setInterval(() => setTick((t: number) => t + 1), 60_000);
+        return () => clearInterval(interval);
+    }, []);
+
     if (projects.length === 0) return null;
 
     return (
