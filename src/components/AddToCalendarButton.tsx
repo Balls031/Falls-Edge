@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Calendar } from 'lucide-react';
 
 interface CalendarEvent {
@@ -179,10 +180,10 @@ export default function AddToCalendarButton({ event, size = 'sm' }: AddToCalenda
     const padding = size === 'lg' ? 'p-2.5 md:p-4' : 'p-3 md:p-4';
 
     const calendarOptions = [
-        { label: 'Google Calendar', icon: '🗓️', action: () => window.open(buildGoogleCalendarUrl(event), '_blank') },
-        { label: 'Apple Calendar',  icon: '🍎', action: () => openAppleCalendar(event) },
-        { label: 'Outlook',         icon: '📧', action: () => window.open(buildOutlookUrl(event), '_blank') },
-        { label: 'Yahoo Calendar',  icon: '📅', action: () => window.open(buildYahooUrl(event), '_blank') },
+        { label: 'Google Calendar', action: () => window.open(buildGoogleCalendarUrl(event), '_blank') },
+        { label: 'Apple Calendar',  action: () => openAppleCalendar(event) },
+        { label: 'Outlook',         action: () => window.open(buildOutlookUrl(event), '_blank') },
+        { label: 'Yahoo Calendar',  action: () => window.open(buildYahooUrl(event), '_blank') },
     ];
 
     return (
@@ -212,8 +213,8 @@ export default function AddToCalendarButton({ event, size = 'sm' }: AddToCalenda
                 </div>
             </button>
 
-            {/* Full-screen modal popup */}
-            {isOpen && (
+            {/* Full-screen modal popup via Portal*/}
+            {isOpen && typeof document !== 'undefined' && createPortal(
                 <div
                     ref={containerRef}
                     className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
@@ -257,18 +258,16 @@ export default function AddToCalendarButton({ event, size = 'sm' }: AddToCalenda
                                     option.action();
                                     setIsOpen(false);
                                 }}
-                                className="flex items-center gap-4 px-5 py-4 w-full text-left text-white/80 hover:text-white hover:bg-blueprint-accent/10 transition-all duration-150 border-b border-white/5 last:border-b-0 group/item"
+                                className="block px-5 py-4 w-full text-center text-white/80 hover:text-white hover:bg-blueprint-accent/10 transition-all duration-150 border-b border-white/5 last:border-b-0"
                             >
-                                <span className="text-xl group-hover/item:scale-110 transition-transform duration-150">
-                                    {option.icon}
-                                </span>
                                 <span className="font-tech text-sm tracking-wide">
                                     {option.label}
                                 </span>
                             </button>
                         ))}
                     </div>
-                </div>
+                </div>,
+                document.body
             )}
         </>
     );
