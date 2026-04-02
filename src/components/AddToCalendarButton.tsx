@@ -186,7 +186,7 @@ export default function AddToCalendarButton({ event, size = 'sm' }: AddToCalenda
     ];
 
     return (
-        <div ref={containerRef} className="relative shrink-0">
+        <>
             {/* Pulsing calendar icon */}
             <button
                 onClick={(e) => {
@@ -195,7 +195,7 @@ export default function AddToCalendarButton({ event, size = 'sm' }: AddToCalenda
                     setIsOpen((prev) => !prev);
                 }}
                 title="Add to Calendar"
-                className="relative cursor-pointer group/cal"
+                className="relative cursor-pointer group/cal shrink-0"
             >
                 {size === 'sm' && (
                     <div className="absolute inset-0 bg-blueprint-accent/30 rounded-full animate-ping" />
@@ -212,41 +212,64 @@ export default function AddToCalendarButton({ event, size = 'sm' }: AddToCalenda
                 </div>
             </button>
 
-            {/* Dropdown */}
+            {/* Full-screen modal popup */}
             {isOpen && (
                 <div
-                    className="absolute left-1/2 -translate-x-1/2 top-full mt-2 z-50 min-w-[200px] border border-blueprint-accent/40 bg-[#0a1628]/95 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,240,255,0.15)] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200"
-                    style={{ borderRadius: '2px' }}
+                    ref={containerRef}
+                    className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
+                    onClick={(e) => {
+                        // Close when clicking the backdrop
+                        if (e.target === e.currentTarget) setIsOpen(false);
+                    }}
                 >
-                    {/* Header */}
-                    <div className="px-4 py-2.5 border-b border-blueprint-accent/20 bg-blueprint-accent/5">
-                        <span className="text-blueprint-accent font-mono text-[10px] uppercase tracking-[0.2em]">
-                            Add to Calendar
-                        </span>
-                    </div>
+                    {/* Backdrop */}
+                    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
 
-                    {/* Options */}
-                    {calendarOptions.map((option) => (
-                        <button
-                            key={option.label}
-                            onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                option.action();
-                                setIsOpen(false);
-                            }}
-                            className="flex items-center gap-3 px-4 py-3 w-full text-left text-white/80 hover:text-white hover:bg-blueprint-accent/10 transition-all duration-150 border-b border-white/5 last:border-b-0 group/item"
-                        >
-                            <span className="text-base group-hover/item:scale-110 transition-transform duration-150">
-                                {option.icon}
+                    {/* Popup card */}
+                    <div
+                        className="relative w-full max-w-xs border border-blueprint-accent/40 bg-[#0a1628]/98 backdrop-blur-xl shadow-[0_8px_48px_rgba(0,240,255,0.2)] overflow-hidden"
+                        style={{ borderRadius: '4px' }}
+                    >
+                        {/* Header */}
+                        <div className="flex items-center justify-between px-5 py-3 border-b border-blueprint-accent/20 bg-blueprint-accent/5">
+                            <span className="text-blueprint-accent font-mono text-[11px] uppercase tracking-[0.2em]">
+                                Add to Calendar
                             </span>
-                            <span className="font-tech text-sm tracking-wide">
-                                {option.label}
-                            </span>
-                        </button>
-                    ))}
+                            <button
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    setIsOpen(false);
+                                }}
+                                className="text-white/40 hover:text-white text-lg leading-none transition-colors"
+                            >
+                                ✕
+                            </button>
+                        </div>
+
+                        {/* Options */}
+                        {calendarOptions.map((option) => (
+                            <button
+                                key={option.label}
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    option.action();
+                                    setIsOpen(false);
+                                }}
+                                className="flex items-center gap-4 px-5 py-4 w-full text-left text-white/80 hover:text-white hover:bg-blueprint-accent/10 transition-all duration-150 border-b border-white/5 last:border-b-0 group/item"
+                            >
+                                <span className="text-xl group-hover/item:scale-110 transition-transform duration-150">
+                                    {option.icon}
+                                </span>
+                                <span className="font-tech text-sm tracking-wide">
+                                    {option.label}
+                                </span>
+                            </button>
+                        ))}
+                    </div>
                 </div>
             )}
-        </div>
+        </>
     );
 }
