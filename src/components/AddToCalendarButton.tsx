@@ -16,20 +16,16 @@ interface CalendarEvent {
 
 /**
  * Resolve the best location string for calendar events.
- * Priority: address > fallback location name.
+ * Priority: address > formatted coordinates > fallback location name.
  */
 function resolveLocation(event: CalendarEvent): string {
     if (event.address) return event.address;
+    if (event.coordinates) return `${event.coordinates.lat},${event.coordinates.lng}`;
     return event.location;
 }
 
 function buildDescription(event: CalendarEvent): string {
-    const loc = resolveLocation(event);
-    let desc = `Open House at ${event.title}\n${loc}\nHosted by Falls Edge Construction`;
-    if (!event.address && event.coordinates) {
-        desc += `\n\nMap Navigation: https://maps.google.com/?q=${event.coordinates.lat},${event.coordinates.lng}`;
-    }
-    return desc;
+    return `Open House at ${event.title}\n${resolveLocation(event)}\nHosted by Falls Edge Construction`;
 }
 
 function toGoogleDate(date: string, time: string): string {
