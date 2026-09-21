@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { Project } from '@/lib/data';
+import { getNextOpenHouse } from '@/lib/openHouse';
 
 interface ProjectGalleryProps {
     initialProjects?: Project[];
@@ -35,13 +36,8 @@ export default function ProjectGallery({ initialProjects = [], showTitle = true 
 function ProjectItem({ project, index }: { project: Project; index: number }) {
     const [view, setView] = useState<'photo' | 'blueprint'>('photo');
 
-    // Check for upcoming open houses
-    const now = Date.now();
-    const nextOpenHouse = project.openHouses
-        ?.map(oh => ({ ...oh, dateObj: new Date(`${oh.date}T${oh.startTime}`) }))
-        .filter(oh => oh.dateObj.getTime() > now - (12 * 60 * 60 * 1000))
-        .sort((a, b) => a.dateObj.getTime() - b.dateObj.getTime())?.[0];
-    const hasUpcomingOpenHouse = !!nextOpenHouse;
+    // Badge shows while an open house is upcoming or in progress (Central time)
+    const hasUpcomingOpenHouse = project.status !== 'sold' && !!getNextOpenHouse(project.openHouses);
 
     return (
         <article className="relative group/card">

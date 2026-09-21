@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import AddToCalendarButton from './AddToCalendarButton';
+import { daysUntilOpenHouse, formatOpenHouseDate, formatOpenHouseTime } from '@/lib/openHouse';
 
 interface OpenHouseProject {
     id: string;
@@ -16,32 +17,8 @@ interface OpenHouseProject {
         date: string;
         startTime: string;
         endTime: string;
-        dateObj: Date | string; // Next.js serializes Date to string when passing server→client
     };
 }
-
-function formatTime(time: string) {
-    const [h, m] = time.split(':');
-    const date = new Date();
-    date.setHours(Number(h));
-    date.setMinutes(Number(m));
-    return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-}
-
-function toDate(d: Date | string): Date {
-    return d instanceof Date ? d : new Date(d);
-}
-
-function getDaysUntil(dateObj: Date | string): number {
-    // Compare calendar dates only (strip time component)
-    const now = new Date();
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const eventDate = toDate(dateObj);
-    const target = new Date(eventDate.getFullYear(), eventDate.getMonth(), eventDate.getDate());
-    const diffMs = target.getTime() - today.getTime();
-    return Math.round(diffMs / (1000 * 60 * 60 * 24));
-}
-
 
 
 export default function OpenHouseBanner({ projects }: { projects: OpenHouseProject[] }) {
@@ -58,7 +35,7 @@ export default function OpenHouseBanner({ projects }: { projects: OpenHouseProje
         <section className="w-full max-w-[1340px] min-[2000px]:max-w-[1700px] mx-auto px-4 md:px-12 pt-4 pb-8 md:pb-12 relative z-10">
             <div className="space-y-4">
                 {projects.map((project, i) => {
-                    const daysUntil = getDaysUntil(project.openHouse.dateObj);
+                    const daysUntil = daysUntilOpenHouse(project.openHouse.date);
                     const isToday = daysUntil <= 0;
                     const isTomorrow = daysUntil === 1;
                     const urgencyLabel = isToday ? 'TODAY' : isTomorrow ? 'TOMORROW' : `IN ${daysUntil} DAYS`;
@@ -117,10 +94,10 @@ export default function OpenHouseBanner({ projects }: { projects: OpenHouseProje
                                         <div className="flex items-center gap-4 md:gap-6 w-full md:w-auto justify-between md:justify-end pl-16 md:pl-0">
                                             <div className="text-right">
                                                 <p className="text-white font-mono text-sm md:text-base tracking-wide">
-                                                    {toDate(project.openHouse.dateObj).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+                                                    {formatOpenHouseDate(project.openHouse.date, { weekday: 'short', month: 'short', day: 'numeric' })}
                                                 </p>
                                                 <p className="text-blueprint-accent font-mono text-xs md:text-sm">
-                                                    {formatTime(project.openHouse.startTime)} – {formatTime(project.openHouse.endTime)}
+                                                    {formatOpenHouseTime(project.openHouse.startTime)} – {formatOpenHouseTime(project.openHouse.endTime)}
                                                 </p>
                                             </div>
                                             <div className="text-blueprint-accent group-hover:translate-x-1 transition-transform duration-300">

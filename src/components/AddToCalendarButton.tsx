@@ -43,6 +43,7 @@ function buildGoogleCalendarUrl(event: CalendarEvent): string {
         dates: `${toGoogleDate(event.date, event.startTime)}/${toGoogleDate(event.date, event.endTime)}`,
         details: buildDescription(event),
         location: loc,
+        ctz: 'America/Chicago', // times above are Central wall-clock; without this Google assumes the viewer's zone
     });
     return `https://calendar.google.com/calendar/render?${params.toString()}`;
 }

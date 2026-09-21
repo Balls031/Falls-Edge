@@ -3,6 +3,7 @@ import ProjectGallery from '@/components/ProjectGallery';
 import OpenHouseBanner from '@/components/OpenHouseBanner';
 import Link from 'next/link';
 import { getProjects } from "@/lib/storage";
+import { isOpenHouseCurrent, getOpenHouseWindow } from "@/lib/openHouse";
 
 export const dynamic = 'force-dynamic'; // Ensure we get fresh data
 
@@ -10,17 +11,13 @@ export default async function Home() {
   const projects = await getProjects();
   const featuredProjects = projects.filter(p => p.featured);
 
-  // Collect all projects with upcoming open houses
+  // Collect all upcoming / in-progress open houses (Central time). Sold listings are excluded; pending ones still show.
   const now = Date.now();
   const openHouseProjects = projects
-    .filter(p => p.status === 'available' && p.openHouses?.length)
+    .filter(p => p.status !== 'sold' && p.openHouses?.length)
     .flatMap(p =>
       (p.openHouses || [])
-        .map(oh => ({
-          ...oh,
-          dateObj: new Date(`${oh.date}T${oh.startTime}`),
-        }))
-        .filter(oh => oh.dateObj.getTime() > now - (12 * 60 * 60 * 1000)) // include today's events even if start time passed (12h grace)
+        .filter(oh => isOpenHouseCurrent(oh, now))
         .map(oh => ({
           id: p.id,
           title: p.title,
@@ -30,7 +27,7 @@ export default async function Home() {
           openHouse: oh,
         }))
     )
-    .sort((a, b) => a.openHouse.dateObj.getTime() - b.openHouse.dateObj.getTime())
+    .sort((a, b) => getOpenHouseWindow(a.openHouse).start.getTime() - getOpenHouseWindow(b.openHouse).start.getTime())
     .slice(0, 3); // Max 3 banners
 
   return (

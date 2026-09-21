@@ -9,14 +9,7 @@ import Lightbox from '@/components/Lightbox';
 import { useState, useEffect } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import AddToCalendarButton from './AddToCalendarButton';
-
-function getDaysUntilCalendar(dateObj: Date): number {
-    const now = new Date();
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const target = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate());
-    return Math.round((target.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-}
-
+import { getNextOpenHouse, getOpenHouseWindow, daysUntilOpenHouse, formatOpenHouseDate, formatOpenHouseTime } from '@/lib/openHouse';
 
 
 export default function ProjectDetailView({ project }: { project: Project }) {
@@ -52,14 +45,9 @@ export default function ProjectDetailView({ project }: { project: Project }) {
         setLightboxOpen(true);
     };
 
-    // Open House Logic
-    const sortedOpenHouses = project.openHouses
-        ?.map(oh => ({ ...oh, dateObj: new Date(`${oh.date}T${oh.startTime}`) }))
-        .filter(oh => oh.dateObj.getTime() > Date.now())
-        .sort((a, b) => a.dateObj.getTime() - b.dateObj.getTime());
-
-    const nextOpenHouse = sortedOpenHouses?.[0];
-    const isSoon = nextOpenHouse && (nextOpenHouse.dateObj.getTime() - Date.now() < 10 * 24 * 60 * 60 * 1000); // 10 days
+    // Open House Logic — shows while upcoming or in progress (Central time)
+    const nextOpenHouse = project.status !== 'sold' ? getNextOpenHouse(project.openHouses) : undefined;
+    const isSoon = nextOpenHouse && (getOpenHouseWindow(nextOpenHouse).start.getTime() - Date.now() < 10 * 24 * 60 * 60 * 1000); // 10 days
 
     return (
         <main className="pt-20 pb-20 w-full max-w-[1340px] min-[2000px]:max-w-[1700px] mx-auto px-4 md:px-8 relative">
@@ -93,7 +81,7 @@ export default function ProjectDetailView({ project }: { project: Project }) {
 
             {/* Open House Banner */}
             {isSoon && (() => {
-                const daysUntil = getDaysUntilCalendar(nextOpenHouse.dateObj);
+                const daysUntil = daysUntilOpenHouse(nextOpenHouse.date);
                 const isToday = daysUntil <= 0;
                 const isTomorrow = daysUntil === 1;
                 const urgencyLabel = isToday ? 'TODAY' : isTomorrow ? 'TOMORROW' : `IN ${daysUntil} DAYS`;
@@ -137,22 +125,9 @@ export default function ProjectDetailView({ project }: { project: Project }) {
                                         </span>
                                     </div>
                                     <p className="text-white font-mono text-base md:text-2xl flex flex-col gap-0.5 md:gap-0">
-                                        <span className="font-bold leading-tight">{nextOpenHouse.dateObj.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</span>
+                                        <span className="font-bold leading-tight">{formatOpenHouseDate(nextOpenHouse.date, { weekday: 'long', month: 'long', day: 'numeric' })}</span>
                                         <span className="text-blueprint-accent text-sm md:text-xl">
-                                            {(() => {
-                                                const [h, m] = nextOpenHouse.startTime.split(':');
-                                                const [endH, endM] = nextOpenHouse.endTime.split(':');
-                                                const date = new Date();
-                                                date.setHours(Number(h));
-                                                date.setMinutes(Number(m));
-                                                const startStr = date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-
-                                                date.setHours(Number(endH));
-                                                date.setMinutes(Number(endM));
-                                                const endStr = date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-
-                                                return `${startStr} – ${endStr}`;
-                                            })()}
+                                            {formatOpenHouseTime(nextOpenHouse.startTime)} – {formatOpenHouseTime(nextOpenHouse.endTime)}
                                         </span>
                                     </p>
                                 </div>
