@@ -30,6 +30,7 @@ export type Project = {
     coordinates?: { lat: number; lng: number }; // GPS coordinates for new construction
     scanCount?: { mobile: number; desktop: number };
     openHouses?: { date: string; startTime: string; endTime: string }[];
+    model3dUrl?: string; // Chief Architect 3D Viewer share link (view or embed URL)
 };
 
 export const PROJECTS: Project[] = [

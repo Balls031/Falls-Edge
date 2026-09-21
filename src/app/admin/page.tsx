@@ -48,6 +48,7 @@ export default function AdminPage() {
     const [featured, setFeatured] = useState(false);
     const [imageFit, setImageFit] = useState<'contain' | 'cover' | 'fill'>('contain');
     const [qrCode, setQrCode] = useState('');
+    const [model3dUrl, setModel3dUrl] = useState('');
     const [address, setAddress] = useState('');
     const [coordLat, setCoordLat] = useState('');
     const [coordLng, setCoordLng] = useState('');
@@ -262,6 +263,7 @@ export default function AdminPage() {
         setFeatured(p.featured || false);
         setImageFit((p.imageFit as any) || 'contain');
         setQrCode(p.qrCode || '');
+        setModel3dUrl(p.model3dUrl || '');
         setAddress(p.address || '');
         setCoordLat(p.coordinates?.lat?.toString() || '');
         setCoordLng(p.coordinates?.lng?.toString() || '');
@@ -298,6 +300,7 @@ export default function AdminPage() {
         setFeatured(false);
         setImageFit('contain');
         setQrCode('');
+        setModel3dUrl('');
         setAddress('');
         setCoordLat('');
         setCoordLng('');
@@ -350,6 +353,7 @@ export default function AdminPage() {
                 featured,
                 imageFit,
                 qrCode,
+                model3dUrl: model3dUrl.trim() || undefined,
                 address: address || undefined,
                 coordinates: (coordLat && coordLng) ? { lat: parseFloat(coordLat), lng: parseFloat(coordLng) } : undefined,
                 openHouses,
@@ -599,6 +603,12 @@ export default function AdminPage() {
                                 <div>
                                     <label htmlFor="qrCode" className="block text-[10px] uppercase text-gray-500 mb-2">Sign ID / QR Code (e.g. sign1)</label>
                                     <input id="qrCode" name="qrCode" value={qrCode} onChange={e => setQrCode(e.target.value)} className="w-full bg-black/20 border border-blueprint-line p-3 text-white focus:border-blueprint-accent outline-none font-mono text-sm" placeholder="e.g. sign1" />
+                                </div>
+
+                                <div>
+                                    <label htmlFor="model3dUrl" className="block text-[10px] uppercase text-gray-500 mb-2">3D Model Link <span className="text-gray-600 normal-case">(Chief Architect 3D Viewer share link — optional)</span></label>
+                                    <input id="model3dUrl" name="model3dUrl" value={model3dUrl} onChange={e => setModel3dUrl(e.target.value)} className="w-full bg-black/20 border border-blueprint-line p-3 text-white focus:border-blueprint-accent outline-none font-mono text-sm" placeholder="https://accounts.chiefarchitect.com/3DV/view?share=..." />
+                                    <p className="text-[10px] text-gray-600 mt-1">Adds a &quot;3D Tour&quot; tab to the listing. Paste the share link from Chief Architect's 3D Viewer.</p>
                                 </div>
 
                                 <div>

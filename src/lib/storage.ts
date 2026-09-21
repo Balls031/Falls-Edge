@@ -1,12 +1,38 @@
 import { Project } from './data';
-import { supabase, supabaseAdmin } from './supabase';
+import { supabase, supabaseAdmin, isSupabaseConfigured } from './supabase';
+import { promises as fs } from 'fs';
+import path from 'path';
 
 // Use admin client if available (server-side), otherwise falls back to public client
 const db = supabaseAdmin;
 
+// --- Local JSON fallback (dev only, when no Supabase env vars are set) ---
+
+const DATA_DIR = path.join(process.cwd(), 'data');
+
+async function readLocal<T>(file: string): Promise<T[]> {
+    try {
+        const raw = await fs.readFile(path.join(DATA_DIR, file), 'utf-8');
+        return JSON.parse(raw) as T[];
+    } catch {
+        return [];
+    }
+}
+
+async function writeLocal<T>(file: string, items: T[]): Promise<void> {
+    await fs.writeFile(path.join(DATA_DIR, file), JSON.stringify(items, null, 2) + '\n', 'utf-8');
+}
+
+const useLocal = !isSupabaseConfigured;
+if (useLocal) {
+    console.warn('[storage] Supabase not configured — using local JSON files in /data');
+}
+
 // --- Projects ---
 
 export async function getProjects(): Promise<Project[]> {
+    if (useLocal) return readLocal<Project>('projects.json');
+
     const { data, error } = await db
         .from('projects')
         .select('*')
@@ -20,6 +46,13 @@ export async function getProjects(): Promise<Project[]> {
 }
 
 export async function saveProjects(projects: Project[]): Promise<void> {
+    if (useLocal) {
+        const existing = await readLocal<Project>('projects.json');
+        const byId = new Map(existing.map(p => [p.id, p]));
+        projects.forEach(p => byId.set(p.id, { ...byId.get(p.id), ...p }));
+        return writeLocal('projects.json', [...byId.values()]);
+    }
+
     // This function originally overwrote the whole file. 
     // For Supabase, we should probably upsert them all.
     // However, mass overwrite is dangerous if we don't handle deletions.
@@ -36,6 +69,11 @@ export async function saveProjects(projects: Project[]): Promise<void> {
 }
 
 export async function addProject(project: Project): Promise<void> {
+    if (useLocal) {
+        const existing = await readLocal<Project>('projects.json');
+        return writeLocal('projects.json', [...existing, project]);
+    }
+
     const { error } = await db
         .from('projects')
         .insert(project);
@@ -47,6 +85,11 @@ export async function addProject(project: Project): Promise<void> {
 }
 
 export async function deleteProject(id: string): Promise<void> {
+    if (useLocal) {
+        const existing = await readLocal<Project>('projects.json');
+        return writeLocal('projects.json', existing.filter(p => p.id !== id));
+    }
+
     const { error } = await db
         .from('projects')
         .delete()
@@ -59,6 +102,11 @@ export async function deleteProject(id: string): Promise<void> {
 }
 
 export async function updateProject(project: Project): Promise<void> {
+    if (useLocal) {
+        const existing = await readLocal<Project>('projects.json');
+        return writeLocal('projects.json', existing.map(p => p.id === project.id ? { ...p, ...project } : p));
+    }
+
     const { error } = await db
         .from('projects')
         .update(project)
@@ -79,6 +127,16 @@ export async function incrementProjectScan(id: string, device: 'mobile' | 'deskt
     // Better: use an RPC if possible, but I don't have access to create RPCs easily without SQL tool (which I might have, but simple RMW is safer for now).
 
     // Actually, let's fetch, update in memory, and save back.
+    if (useLocal) {
+        const existing = await readLocal<Project>('projects.json');
+        const target = existing.find(p => p.id === id);
+        if (!target) return;
+        const counts = target.scanCount || { mobile: 0, desktop: 0 };
+        counts[device] = (counts[device] || 0) + 1;
+        target.scanCount = counts;
+        return writeLocal('projects.json', existing);
+    }
+
     const { data: project, error: fetchError } = await db
         .from('projects')
         .select('scanCount')
@@ -103,6 +161,8 @@ export async function incrementProjectScan(id: string, device: 'mobile' | 'deskt
 // --- Realtors ---
 
 export async function getRealtors(): Promise<any[]> {
+    if (useLocal) return readLocal<any>('realtors.json');
+
     const { data, error } = await db
         .from('realtors')
         .select('*');
@@ -115,6 +175,13 @@ export async function getRealtors(): Promise<any[]> {
 }
 
 export async function saveRealtors(realtors: any[]): Promise<void> {
+    if (useLocal) {
+        const existing = await readLocal<any>('realtors.json');
+        const byId = new Map(existing.map(r => [r.id, r]));
+        realtors.forEach(r => byId.set(r.id, { ...byId.get(r.id), ...r }));
+        return writeLocal('realtors.json', [...byId.values()]);
+    }
+
     const { error } = await db
         .from('realtors')
         .upsert(realtors);
@@ -126,6 +193,11 @@ export async function saveRealtors(realtors: any[]): Promise<void> {
 }
 
 export async function addRealtor(realtor: any): Promise<void> {
+    if (useLocal) {
+        const existing = await readLocal<any>('realtors.json');
+        return writeLocal('realtors.json', [...existing, realtor]);
+    }
+
     const { error } = await db
         .from('realtors')
         .insert(realtor);
@@ -137,6 +209,11 @@ export async function addRealtor(realtor: any): Promise<void> {
 }
 
 export async function deleteRealtor(id: string): Promise<void> {
+    if (useLocal) {
+        const existing = await readLocal<any>('realtors.json');
+        return writeLocal('realtors.json', existing.filter(r => r.id !== id));
+    }
+
     const { error } = await db
         .from('realtors')
         .delete()
@@ -149,6 +226,11 @@ export async function deleteRealtor(id: string): Promise<void> {
 }
 
 export async function updateRealtor(realtor: any): Promise<void> {
+    if (useLocal) {
+        const existing = await readLocal<any>('realtors.json');
+        return writeLocal('realtors.json', existing.map(r => r.id === realtor.id ? { ...r, ...realtor } : r));
+    }
+
     const { error } = await db
         .from('realtors')
         .update(realtor)
@@ -181,6 +263,8 @@ export async function updateRealtorInProjects(realtor: any): Promise<void> {
     }
 
     // Batch update all affected projects
+    if (useLocal) return saveProjects(updates);
+
     for (const project of updates) {
         const { error } = await db
             .from('projects')

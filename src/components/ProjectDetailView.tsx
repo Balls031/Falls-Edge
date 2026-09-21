@@ -3,7 +3,8 @@
 import Link from 'next/link';
 import { Project } from '@/lib/data';
 import ContactCard from '@/components/ContactCard';
-import ProjectTabs from '@/components/ProjectTabs';
+import ProjectTabs, { ViewMode } from '@/components/ProjectTabs';
+import { toModel3dEmbedUrl } from '@/lib/model3d';
 import Lightbox from '@/components/Lightbox';
 import { useState, useEffect } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
@@ -19,7 +20,8 @@ function getDaysUntilCalendar(dateObj: Date): number {
 
 
 export default function ProjectDetailView({ project }: { project: Project }) {
-    const [tab, setTab] = useState<'photos' | 'plans'>('photos');
+    const [tab, setTab] = useState<ViewMode>('photos');
+    const [tourLoaded, setTourLoaded] = useState(false);
     const [lightboxOpen, setLightboxOpen] = useState(false);
     const [photoIndex, setPhotoIndex] = useState(0);
     const [isNarrativeOpen, setIsNarrativeOpen] = useState(false);
@@ -34,6 +36,16 @@ export default function ProjectDetailView({ project }: { project: Project }) {
     const galleryPhotos = (project.gallery && project.gallery.length > 0) ? project.gallery : [project.image];
     const blueprints = project.blueprints || (project.blueprint ? [project.blueprint] : []);
     const allPhotos = [...galleryPhotos, ...blueprints];
+    const tourUrl = toModel3dEmbedUrl(project.model3dUrl);
+
+    // The 3D tour is desktop-only. If the viewport drops below md while it's open, fall back to photos.
+    useEffect(() => {
+        const mq = window.matchMedia('(max-width: 767px)');
+        const check = () => { if (mq.matches) setTab(t => (t === 'tour' ? 'photos' : t)); };
+        check();
+        mq.addEventListener('change', check);
+        return () => mq.removeEventListener('change', check);
+    }, []);
 
     const openLightbox = (index: number) => {
         setPhotoIndex(index);
@@ -59,26 +71,24 @@ export default function ProjectDetailView({ project }: { project: Project }) {
             </div>
 
             {/* Header Area: Title & Contact Card */}
-            <header className="w-full px-[40px] md:px-[80px] mb-4 md:mb-8 relative">
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-end border-b border-blueprint-line pb-4 md:pb-8">
+            <header className="w-full px-[40px] md:px-[80px] mb-4 md:mb-8">
+                <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end border-b border-blueprint-line pb-4 md:pb-8">
                     {/* Left: Title & Info */}
-                    <div className="border-l-2 border-blueprint-accent pl-4 md:pl-6 mt-4 md:mt-12 mb-8 md:mb-0">
+                    <div className="border-l-2 border-blueprint-accent pl-4 md:pl-6 mt-4 md:mt-12 mb-8 lg:mb-0">
                         <span className="block text-blueprint-accent font-mono text-xs md:text-sm tracking-[0.3em] mb-1">PROJECT NO. {(project.projectNumber || project.id).padStart(3, '0')}</span>
                         <h1 className="text-3xl sm:text-5xl md:text-7xl font-architect text-white mb-1 leading-none">{project.title}</h1>
                         <p className="text-base md:text-xl text-gray-400 font-tech">{project.location}</p>
                     </div>
 
-
-                </div>
-
-                {/* Status Stamp */}
-                {project.status !== 'available' && (
-                    <div className="absolute top-[80px] md:top-0 right-[10%] md:right-[40%] border-[6px] border-red-700/80 text-red-700/80 p-4 font-bold uppercase text-4xl -rotate-12 opacity-80 mix-blend-screen select-none pointer-events-none z-20">
-                        <div className="border border-red-700/80 px-4 py-1">
-                            {project.status}
+                    {/* Status Stamp — sits in the flow (below the title on mobile, beside it on desktop) so it never lands under the fixed header or on top of the title. */}
+                    {project.status !== 'available' && (
+                        <div className="shrink-0 whitespace-nowrap self-end lg:self-center mr-[10%] lg:mr-[25%] mb-2 lg:mb-0 border-[4px] md:border-[6px] border-red-700/80 text-red-700/80 p-2 md:p-4 font-bold uppercase text-2xl md:text-4xl -rotate-12 opacity-80 mix-blend-screen select-none pointer-events-none">
+                            <div className="border border-red-700/80 px-3 md:px-4 py-1">
+                                {project.status}
+                            </div>
                         </div>
-                    </div>
-                )}
+                    )}
+                </div>
             </header>
 
             {/* Open House Banner */}
@@ -260,7 +270,7 @@ export default function ProjectDetailView({ project }: { project: Project }) {
             <section className="w-full px-[40px] md:px-[80px] mb-[40px]">
                 <div className="mb-0 flex items-end justify-between border-b border-blueprint-line pb-2">
                     <h3 className="font-architect text-2xl text-white mr-12">Images</h3>
-                    <ProjectTabs view={tab} onChange={setTab} />
+                    <ProjectTabs view={tab} onChange={setTab} hasTour={!!tourUrl} />
                 </div>
 
                 <div className="pt-10 min-h-[400px]">
@@ -290,20 +300,6 @@ export default function ProjectDetailView({ project }: { project: Project }) {
                                 <div key={i} className="border border-blueprint-line relative bg-blueprint/50 overflow-hidden flex flex-col">
                                     <div className="relative w-full flex justify-center py-4">
                                         <img src={plan} className="max-w-full max-h-[85vh] w-auto h-auto object-contain shadow-sm" alt={`Blueprint ${i + 1}`} />
-                                        <div className="hidden md:block absolute bottom-6 left-6 border border-blueprint-accent bg-black/80 p-4 max-w-xs">
-                                            <h4 className="text-blueprint-accent text-xs font-bold uppercase mb-1">Plan View {i + 1}</h4>
-                                            <p className="text-gray-400 text-[10px] leading-tight">
-                                                All dimensions are approximate. Actual construction may vary.
-                                                Refer to official CAD documents for precise measurements.
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <div className="md:hidden border-t border-blueprint-line bg-black/40 p-4">
-                                        <h4 className="text-blueprint-accent text-xs font-bold uppercase mb-1">Plan View {i + 1}</h4>
-                                        <p className="text-gray-400 text-[10px] leading-tight">
-                                            All dimensions are approximate. Actual construction may vary.
-                                            Refer to official CAD documents for precise measurements.
-                                        </p>
                                     </div>
                                 </div>
                             ))}
@@ -312,6 +308,38 @@ export default function ProjectDetailView({ project }: { project: Project }) {
                             )}
                         </div>
                     </div>
+
+                    {/* 3D Tour — Chief Architect 3D Viewer embed. Iframe is only mounted once the tab is opened so the model doesn't download on every page view. */}
+                    {tourUrl && (
+                        <div className={tab === 'tour' ? 'hidden md:block' : 'hidden'}>
+                            <div className="border border-blueprint-line relative bg-blueprint/50 overflow-hidden">
+                                <div className="absolute -top-[1px] -left-[1px] w-2 h-2 border-t border-l border-white/50 z-10" />
+                                <div className="absolute -top-[1px] -right-[1px] w-2 h-2 border-t border-r border-white/50 z-10" />
+                                <div className="absolute -bottom-[1px] -left-[1px] w-2 h-2 border-b border-l border-white/50 z-10" />
+                                <div className="absolute -bottom-[1px] -right-[1px] w-2 h-2 border-b border-r border-white/50 z-10" />
+                                <div className="relative w-full aspect-[4/3] md:aspect-video bg-black/40">
+                                    {(tab === 'tour' || tourLoaded) ? (
+                                        <iframe
+                                            src={tourUrl}
+                                            title={`${project.title} 3D Tour`}
+                                            className="absolute inset-0 w-full h-full border-0"
+                                            allow="fullscreen; xr-spatial-tracking"
+                                            allowFullScreen
+                                            loading="lazy"
+                                            onLoad={() => setTourLoaded(true)}
+                                        />
+                                    ) : null}
+                                </div>
+                                <div className="border-t border-blueprint-line bg-black/40 p-4">
+                                    <h4 className="text-blueprint-accent text-xs font-bold uppercase mb-1">Interactive 3D Walkthrough</h4>
+                                    <p className="text-gray-400 text-[10px] leading-tight">
+                                        Click and drag to look around. Use the menu inside the viewer to switch cameras or open a cross section.
+                                        Finishes and colors shown are for illustration only.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </section >
 

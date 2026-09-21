@@ -1,4 +1,4 @@
-import { supabaseAdmin } from './supabase';
+import { supabaseAdmin, isSupabaseConfigured } from './supabase';
 
 const db = supabaseAdmin;
 
@@ -11,6 +11,8 @@ const DEFAULT_SETTINGS: SiteSettings = {
 };
 
 export async function getSiteSettings(): Promise<SiteSettings> {
+    if (!isSupabaseConfigured) return DEFAULT_SETTINGS; // local dev without Supabase
+
     try {
         const { data, error } = await db
             .from('site_settings')
@@ -37,6 +39,8 @@ export async function getSiteSettings(): Promise<SiteSettings> {
 }
 
 export async function updateSiteSetting(key: string, value: string): Promise<void> {
+    if (!isSupabaseConfigured) return; // local dev without Supabase — settings aren't persisted
+
     // Upsert the setting
     const { error } = await db
         .from('site_settings')
