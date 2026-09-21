@@ -21,33 +21,28 @@ interface OpenHouseProject {
 }
 
 
-export default function OpenHouseBanner({ projects }: { projects: OpenHouseProject[] }) {
-    // Force re-render every 60s so the urgency label stays current (e.g. at midnight)
-    const [, setTick] = useState(0);
-    useEffect(() => {
-        const interval = setInterval(() => setTick((t: number) => t + 1), 60_000);
-        return () => clearInterval(interval);
-    }, []);
-
-    if (projects.length === 0) return null;
+function OpenHouseBannerItem({ project, index }: { project: OpenHouseProject; index: number }) {
+    const [calOpen, setCalOpen] = useState(false);
+    const daysUntil = daysUntilOpenHouse(project.openHouse.date);
+    const isToday = daysUntil <= 0;
+    const isTomorrow = daysUntil === 1;
+    const urgencyLabel = isToday ? 'TODAY' : isTomorrow ? 'TOMORROW' : `IN ${daysUntil} DAYS`;
 
     return (
-        <section className="w-full max-w-[1340px] min-[2000px]:max-w-[1700px] mx-auto px-4 md:px-12 pt-4 pb-8 md:pb-12 relative z-10">
-            <div className="space-y-4">
-                {projects.map((project, i) => {
-                    const daysUntil = daysUntilOpenHouse(project.openHouse.date);
-                    const isToday = daysUntil <= 0;
-                    const isTomorrow = daysUntil === 1;
-                    const urgencyLabel = isToday ? 'TODAY' : isTomorrow ? 'TOMORROW' : `IN ${daysUntil} DAYS`;
-
-                    return (
                         <motion.div
-                            key={`${project.id}-${i}`}
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 1.8 + i * 0.15, duration: 0.6 }}
+                            transition={{ delay: 1.8 + index * 0.15, duration: 0.6 }}
                         >
-                            <Link href={`/projects/${project.id}`} className="block group">
+                            {/* Whole card opens the Add-to-Calendar chooser; the arrow on the right goes to the listing. */}
+                            <div
+                                role="button"
+                                tabIndex={0}
+                                onClick={() => setCalOpen(true)}
+                                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setCalOpen(true); } }}
+                                title="Add this open house to your calendar"
+                                className="block group cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-blueprint-accent"
+                            >
                                 <div className="relative border border-blueprint-accent/60 bg-gradient-to-r from-blueprint-accent/10 via-blueprint/60 to-blueprint-accent/10 backdrop-blur-lg p-5 md:p-6 overflow-hidden hover:border-blueprint-accent transition-all duration-300">
                                     {/* Animated shimmer effect */}
                                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-blueprint-accent/5 to-transparent animate-[shimmer_3s_ease-in-out_infinite] pointer-events-none" />
@@ -73,6 +68,8 @@ export default function OpenHouseBanner({ projects }: { projects: OpenHouseProje
                                                     coordinates: project.coordinates,
                                                 }}
                                                 size="sm"
+                                                open={calOpen}
+                                                onOpenChange={setCalOpen}
                                             />
 
                                             <div>
@@ -99,17 +96,41 @@ export default function OpenHouseBanner({ projects }: { projects: OpenHouseProje
                                                 <p className="text-blueprint-accent font-mono text-xs md:text-sm">
                                                     {formatOpenHouseTime(project.openHouse.startTime)} – {formatOpenHouseTime(project.openHouse.endTime)}
                                                 </p>
+                                                <p className="text-white/40 font-mono text-[9px] md:text-[10px] uppercase tracking-widest mt-1">Click to add to calendar</p>
                                             </div>
-                                            <div className="text-blueprint-accent group-hover:translate-x-1 transition-transform duration-300">
-                                                <ArrowRight size={20} />
-                                            </div>
+                                            <Link
+                                                href={`/projects/${project.id}`}
+                                                onClick={(e) => e.stopPropagation()}
+                                                title="View this home"
+                                                className="flex items-center gap-1 text-blueprint-accent hover:text-white transition-colors duration-300 shrink-0"
+                                            >
+                                                <span className="hidden md:inline font-mono text-[10px] uppercase tracking-widest">View Home</span>
+                                                <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform duration-300" />
+                                            </Link>
                                         </div>
                                     </div>
                                 </div>
-                            </Link>
+                            </div>
                         </motion.div>
-                    );
-                })}
+    );
+}
+
+export default function OpenHouseBanner({ projects }: { projects: OpenHouseProject[] }) {
+    // Force re-render every 60s so the urgency label stays current (e.g. at midnight)
+    const [, setTick] = useState(0);
+    useEffect(() => {
+        const interval = setInterval(() => setTick((t: number) => t + 1), 60_000);
+        return () => clearInterval(interval);
+    }, []);
+
+    if (projects.length === 0) return null;
+
+    return (
+        <section className="w-full max-w-[1340px] min-[2000px]:max-w-[1700px] mx-auto px-4 md:px-12 pt-4 pb-8 md:pb-12 relative z-10">
+            <div className="space-y-4">
+                {projects.map((project, i) => (
+                    <OpenHouseBannerItem key={`${project.id}-${i}`} project={project} index={i} />
+                ))}
             </div>
         </section>
     );

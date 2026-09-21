@@ -1,11 +1,12 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X, Sparkles } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 type LightboxProps = {
     images: string[];
+    aiImages?: string[]; // subset of images that are AI renderings
     initialIndex: number;
     isOpen: boolean;
     onClose: () => void;
@@ -13,7 +14,7 @@ type LightboxProps = {
     onPrev: () => void;
 };
 
-export default function Lightbox({ images, initialIndex, isOpen, onClose, onNext, onPrev }: LightboxProps) {
+export default function Lightbox({ images, aiImages = [], initialIndex, isOpen, onClose, onNext, onPrev }: LightboxProps) {
     // Touch state for swipe
     const [touchStart, setTouchStart] = useState<number | null>(null);
     const [touchEnd, setTouchEnd] = useState<number | null>(null);
@@ -97,8 +98,13 @@ export default function Lightbox({ images, initialIndex, isOpen, onClose, onNext
                     />
 
                     {/* Counter */}
-                    <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 text-white/50 font-mono text-xs tracking-widest">
-                        IMAGE {initialIndex + 1} / {images.length}
+                    <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 flex items-center gap-3 text-white/50 font-mono text-xs tracking-widest whitespace-nowrap">
+                        <span>IMAGE {initialIndex + 1} / {images.length}</span>
+                        {aiImages.includes(images[initialIndex]) && (
+                            <span className="flex items-center gap-1 bg-blueprint-accent/90 text-black font-bold px-1.5 py-px text-[10px] tracking-normal" title="AI-generated rendering">
+                                <Sparkles size={10} /> AI RENDERING
+                            </span>
+                        )}
                     </div>
                 </motion.div>
 

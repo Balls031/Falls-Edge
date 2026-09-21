@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { Calendar } from 'lucide-react';
 
@@ -152,10 +152,18 @@ interface AddToCalendarButtonProps {
     event: CalendarEvent;
     /** Size variant — 'sm' for home banner, 'lg' for detail page */
     size?: 'sm' | 'lg';
+    /** Optional controlled mode so a parent (e.g. the whole open house card) can open the chooser too. */
+    open?: boolean;
+    onOpenChange?: (open: boolean) => void;
 }
 
-export default function AddToCalendarButton({ event, size = 'sm' }: AddToCalendarButtonProps) {
-    const [isOpen, setIsOpen] = useState(false);
+export default function AddToCalendarButton({ event, size = 'sm', open, onOpenChange }: AddToCalendarButtonProps) {
+    const [internalOpen, setInternalOpen] = useState(false);
+    const isOpen = open ?? internalOpen;
+    const setIsOpen = useCallback((next: boolean) => {
+        if (onOpenChange) onOpenChange(next);
+        else setInternalOpen(next);
+    }, [onOpenChange]);
     const containerRef = useRef<HTMLDivElement>(null);
 
     // Close on outside click
@@ -168,7 +176,7 @@ export default function AddToCalendarButton({ event, size = 'sm' }: AddToCalenda
         }
         document.addEventListener('mousedown', handleClick);
         return () => document.removeEventListener('mousedown', handleClick);
-    }, [isOpen]);
+    }, [isOpen, setIsOpen]);
 
     // Close on Escape
     useEffect(() => {
@@ -178,7 +186,7 @@ export default function AddToCalendarButton({ event, size = 'sm' }: AddToCalenda
         }
         document.addEventListener('keydown', handleKey);
         return () => document.removeEventListener('keydown', handleKey);
-    }, [isOpen]);
+    }, [isOpen, setIsOpen]);
 
     const iconSize = size === 'lg' ? 28 : 22;
     const iconSizeMobile = size === 'lg' ? 20 : 22;
@@ -198,7 +206,7 @@ export default function AddToCalendarButton({ event, size = 'sm' }: AddToCalenda
                 onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    setIsOpen((prev) => !prev);
+                    setIsOpen(!isOpen);
                 }}
                 title="Add to Calendar"
                 className="relative cursor-pointer group/cal shrink-0"
@@ -221,18 +229,19 @@ export default function AddToCalendarButton({ event, size = 'sm' }: AddToCalenda
             {/* Full-screen modal popup via Portal*/}
             {isOpen && typeof document !== 'undefined' && createPortal(
                 <div
-                    ref={containerRef}
                     className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
                     onClick={(e) => {
+                        e.stopPropagation(); // don't re-trigger the card that opened us
                         // Close when clicking the backdrop
                         if (e.target === e.currentTarget) setIsOpen(false);
                     }}
                 >
-                    {/* Backdrop */}
-                    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+                    {/* Backdrop — click to dismiss */}
+                    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsOpen(false)} />
 
                     {/* Popup card */}
                     <div
+                        ref={containerRef}
                         className="relative w-full max-w-xs border border-blueprint-accent/40 bg-[#0a1628]/98 backdrop-blur-xl shadow-[0_8px_48px_rgba(0,240,255,0.2)] overflow-hidden"
                         style={{ borderRadius: '4px' }}
                     >

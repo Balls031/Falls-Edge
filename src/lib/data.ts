@@ -31,6 +31,7 @@ export type Project = {
     scanCount?: { mobile: number; desktop: number };
     openHouses?: { date: string; startTime: string; endTime: string }[];
     model3dUrl?: string; // Chief Architect 3D Viewer share link (view or embed URL)
+    aiImages?: string[]; // Gallery URLs that are AI-generated renderings (shown with an "AI" badge)
 };
 
 export const PROJECTS: Project[] = [

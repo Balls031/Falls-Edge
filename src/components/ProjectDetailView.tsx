@@ -7,7 +7,7 @@ import ProjectTabs, { ViewMode } from '@/components/ProjectTabs';
 import { toModel3dEmbedUrl } from '@/lib/model3d';
 import Lightbox from '@/components/Lightbox';
 import { useState, useEffect } from 'react';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronDown, ChevronUp, Sparkles } from 'lucide-react';
 import AddToCalendarButton from './AddToCalendarButton';
 import { getNextOpenHouse, getOpenHouseWindow, daysUntilOpenHouse, formatOpenHouseDate, formatOpenHouseTime } from '@/lib/openHouse';
 
@@ -18,6 +18,7 @@ export default function ProjectDetailView({ project }: { project: Project }) {
     const [lightboxOpen, setLightboxOpen] = useState(false);
     const [photoIndex, setPhotoIndex] = useState(0);
     const [isNarrativeOpen, setIsNarrativeOpen] = useState(false);
+    const [calOpen, setCalOpen] = useState(false); // Add-to-Calendar chooser for the open house box
 
     // Force re-render every 60s so the urgency label stays current (e.g. at midnight)
     const [, setTick] = useState(0);
@@ -30,6 +31,7 @@ export default function ProjectDetailView({ project }: { project: Project }) {
     const blueprints = project.blueprints || (project.blueprint ? [project.blueprint] : []);
     const allPhotos = [...galleryPhotos, ...blueprints];
     const tourUrl = toModel3dEmbedUrl(project.model3dUrl);
+    const aiImages = project.aiImages || [];
 
     // The 3D tour is desktop-only. If the viewport drops below md while it's open, fall back to photos.
     useEffect(() => {
@@ -88,7 +90,15 @@ export default function ProjectDetailView({ project }: { project: Project }) {
 
                 return (
                 <div className="w-full px-[40px] md:px-[80px] mb-8">
-                    <div className="relative border-2 border-blueprint-accent bg-gradient-to-r from-blueprint-accent/15 via-blueprint/60 to-blueprint-accent/15 p-6 md:p-8 backdrop-blur-lg overflow-hidden shadow-[0_0_30px_rgba(0,240,255,0.15)]">
+                    {/* Whole box opens the Add-to-Calendar chooser */}
+                    <div
+                        role="button"
+                        tabIndex={0}
+                        onClick={() => setCalOpen(true)}
+                        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setCalOpen(true); } }}
+                        title="Add this open house to your calendar"
+                        className="relative border-2 border-blueprint-accent bg-gradient-to-r from-blueprint-accent/15 via-blueprint/60 to-blueprint-accent/15 p-6 md:p-8 backdrop-blur-lg overflow-hidden shadow-[0_0_30px_rgba(0,240,255,0.15)] cursor-pointer hover:border-white hover:shadow-[0_0_40px_rgba(0,240,255,0.3)] transition-all duration-300 outline-none focus-visible:ring-2 focus-visible:ring-white"
+                    >
                         {/* Shimmer animation */}
                         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-blueprint-accent/5 to-transparent animate-[shimmer_3s_ease-in-out_infinite] pointer-events-none" />
 
@@ -114,6 +124,8 @@ export default function ProjectDetailView({ project }: { project: Project }) {
                                             coordinates: project.coordinates,
                                         }}
                                         size="lg"
+                                        open={calOpen}
+                                        onOpenChange={setCalOpen}
                                     />
                                 </div>
 
@@ -130,6 +142,7 @@ export default function ProjectDetailView({ project }: { project: Project }) {
                                             {formatOpenHouseTime(nextOpenHouse.startTime)} – {formatOpenHouseTime(nextOpenHouse.endTime)}
                                         </span>
                                     </p>
+                                    <p className="text-white/40 font-mono text-[9px] md:text-[10px] uppercase tracking-widest mt-2">Click anywhere to add to your calendar</p>
                                 </div>
                             </div>
                         </div>
@@ -263,7 +276,14 @@ export default function ProjectDetailView({ project }: { project: Project }) {
                                     <div className="absolute -bottom-[1px] -left-[1px] w-2 h-2 border-b border-l border-white/50" />
                                     <div className="absolute -bottom-[1px] -right-[1px] w-2 h-2 border-b border-r border-white/50" />
                                     <img src={img} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" alt={`Detail ${i}`} />
-                                    <span className="absolute bottom-3 right-3 text-[10px] text-white bg-black/50 px-1 font-mono">FIG. {i + 1}</span>
+                                    <span className="absolute bottom-3 right-3 flex items-center gap-1.5 font-mono text-[10px]">
+                                        {aiImages.includes(img) && (
+                                            <span className="flex items-center gap-1 bg-blueprint-accent/90 text-black font-bold px-1.5 py-px" title="AI-generated rendering">
+                                                <Sparkles size={10} /> AI
+                                            </span>
+                                        )}
+                                        <span className="text-white bg-black/50 px-1">FIG. {i + 1}</span>
+                                    </span>
                                 </div>
                             ))}
                         </div>
@@ -321,6 +341,7 @@ export default function ProjectDetailView({ project }: { project: Project }) {
             <Lightbox
                 isOpen={lightboxOpen}
                 images={allPhotos}
+                aiImages={aiImages}
                 initialIndex={photoIndex}
                 onClose={() => setLightboxOpen(false)}
                 onNext={() => setPhotoIndex((i) => (i + 1) % allPhotos.length)}

@@ -4,15 +4,16 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Project, Realtor } from '@/lib/data';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
+import { Sparkles } from 'lucide-react';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, rectSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
-function SortableItem({ id, url, onRemove }: { id: string, url: string, onRemove: () => void }) {
+function SortableItem({ id, url, onRemove, isAi, onToggleAi }: { id: string, url: string, onRemove: () => void, isAi?: boolean, onToggleAi?: () => void }) {
     const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id });
     const style = { transform: CSS.Transform.toString(transform), transition };
 
     return (
-        <div ref={setNodeRef} style={style} {...attributes} {...listeners} className="relative group aspect-square bg-black/40 border border-blueprint-line cursor-move">
+        <div ref={setNodeRef} style={style} {...attributes} {...listeners} className={`relative group aspect-square bg-black/40 border cursor-move ${isAi ? 'border-blueprint-accent' : 'border-blueprint-line'}`}>
             <img src={url} alt="Gallery" className="w-full h-full object-cover" />
             <button
                 type="button"
@@ -22,6 +23,17 @@ function SortableItem({ id, url, onRemove }: { id: string, url: string, onRemove
             >
                 X
             </button>
+            {onToggleAi && (
+                <button
+                    type="button"
+                    onPointerDown={(e) => e.stopPropagation()}
+                    onClick={(e) => { e.stopPropagation(); e.preventDefault(); onToggleAi(); }}
+                    title={isAi ? 'Marked as AI rendering — click to unmark' : 'Mark this photo as an AI rendering'}
+                    className={`absolute bottom-1 left-1 flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.5 z-50 cursor-pointer transition-colors ${isAi ? 'bg-blueprint-accent text-black' : 'bg-black/70 text-white/60 hover:text-white'}`}
+                >
+                    <Sparkles size={10} /> AI
+                </button>
+            )}
         </div>
     );
 }
@@ -80,6 +92,7 @@ export default function AdminPage() {
     const [currentImageUrl, setCurrentImageUrl] = useState('');
 
     const [gallery, setGallery] = useState<string[]>([]); // URLs
+    const [aiImages, setAiImages] = useState<string[]>([]); // gallery URLs flagged as AI renderings
     const [blueprints, setBlueprints] = useState<string[]>([]); // URLs
     const [loading, setLoading] = useState(false);
 
@@ -269,6 +282,7 @@ export default function AdminPage() {
         setCoordLng(p.coordinates?.lng?.toString() || '');
         setCurrentImageUrl(p.image || '');
         setGallery(p.gallery || []);
+        setAiImages(p.aiImages || []);
         setBlueprints(p.blueprints || (p.blueprint ? [p.blueprint] : []));
         setOpenHouses(p.openHouses || []);
 
@@ -308,6 +322,7 @@ export default function AdminPage() {
         setImageFile(null);
         setCurrentImageUrl('');
         setGallery([]);
+        setAiImages([]);
         setBlueprints([]);
         setOpenHouses([]);
         setOhDate('');
@@ -340,6 +355,8 @@ export default function AdminPage() {
                 blueprint: blueprints[0] || '', // Fallback
                 blueprints,
                 gallery,
+                // Only send when something is flagged so saves keep working if the column hasn't been added yet
+                ...(aiImages.some(u => gallery.includes(u)) ? { aiImages: aiImages.filter(u => gallery.includes(u)) } : {}),
                 specs: {
                     totalSqft,
                     finishedSqft,
@@ -608,7 +625,7 @@ export default function AdminPage() {
                                 <div>
                                     <label htmlFor="model3dUrl" className="block text-[10px] uppercase text-gray-500 mb-2">3D Model Link <span className="text-gray-600 normal-case">(Chief Architect 3D Viewer share link — optional)</span></label>
                                     <input id="model3dUrl" name="model3dUrl" value={model3dUrl} onChange={e => setModel3dUrl(e.target.value)} className="w-full bg-black/20 border border-blueprint-line p-3 text-white focus:border-blueprint-accent outline-none font-mono text-sm" placeholder="https://accounts.chiefarchitect.com/3DV/view?share=..." />
-                                    <p className="text-[10px] text-gray-600 mt-1">Adds a &quot;3D Tour&quot; tab to the listing. Paste the share link from Chief Architect's 3D Viewer.</p>
+                                    <p className="text-[10px] text-gray-600 mt-1">Adds a &quot;3D Tour&quot; tab to the listing. Paste the share link from Chief Architect&apos;s 3D Viewer.</p>
                                 </div>
 
                                 <div>
@@ -741,12 +758,18 @@ export default function AdminPage() {
                                         </label>
                                     </div>
 
-                                    <label className="block text-[10px] uppercase text-gray-500 mb-4">Gallery (Drag to Reorder)</label>
+                                    <label className="block text-[10px] uppercase text-gray-500 mb-1">Gallery (Drag to Reorder)</label>
+                                    <p className="text-[10px] text-gray-600 mb-4">Click the <span className="text-blueprint-accent">AI</span> tag on a photo to label it as an AI rendering on the listing.</p>
                                     <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
                                         <SortableContext items={gallery} strategy={rectSortingStrategy}>
                                             <div className="grid grid-cols-4 gap-2 mb-4">
                                                 {gallery.map((url) => (
-                                                    <SortableItem key={url} id={url} url={url} onRemove={() => setGallery(g => g.filter(u => u !== url))} />
+                                                    <SortableItem
+                                                        key={url} id={url} url={url}
+                                                        onRemove={() => setGallery(g => g.filter(u => u !== url))}
+                                                        isAi={aiImages.includes(url)}
+                                                        onToggleAi={() => setAiImages(a => a.includes(url) ? a.filter(u => u !== url) : [...a, url])}
+                                                    />
                                                 ))}
                                                 <label className="aspect-square border border-dashed border-gray-600 flex items-center justify-center text-gray-500 hover:text-white hover:border-white cursor-pointer transition-colors">
                                                     <span className="text-2xl">+</span>
