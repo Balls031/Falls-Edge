@@ -32,7 +32,7 @@ export async function POST(request: Request) {
     const name = `${Date.now()}-${safeName}.jpg`;
 
     try {
-        const { data: uploadData, error } = await supabaseAdmin.storage
+        const { error } = await supabaseAdmin.storage
             .from('images')
             .upload(name, processedBuffer, {
                 contentType: 'image/jpeg',

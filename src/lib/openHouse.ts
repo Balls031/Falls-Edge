@@ -6,7 +6,7 @@
  * Central time — regardless of where the server (Vercel runs in UTC) or the visitor is.
  */
 
-export const SITE_TIMEZONE = 'America/Chicago';
+const SITE_TIMEZONE = 'America/Chicago';
 
 /** How long after an open house ends it still counts as "current". */
 const END_GRACE_MS = 30 * 60 * 1000;
@@ -14,7 +14,7 @@ const END_GRACE_MS = 30 * 60 * 1000;
 export type OpenHouse = { date: string; startTime: string; endTime: string };
 
 /** Convert a Central-time wall clock (date + "HH:mm") to a real instant. */
-export function zonedDate(date: string, time: string): Date {
+function zonedDate(date: string, time: string): Date {
     const [y, m, d] = date.split('-').map(Number);
     const [hh, mm] = time.split(':').map(Number);
     const guess = Date.UTC(y, m - 1, d, hh, mm);
@@ -50,7 +50,7 @@ export function getNextOpenHouse<T extends OpenHouse>(openHouses: T[] | undefine
 }
 
 /** Today's calendar date in Central time, as "YYYY-MM-DD". */
-export function todayInSiteTz(now: number = Date.now()): string {
+function todayInSiteTz(now: number = Date.now()): string {
     const parts = Object.fromEntries(
         new Intl.DateTimeFormat('en-CA', { timeZone: SITE_TIMEZONE, year: 'numeric', month: '2-digit', day: '2-digit' })
             .formatToParts(new Date(now)).map(p => [p.type, p.value])

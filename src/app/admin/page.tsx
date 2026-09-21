@@ -134,7 +134,7 @@ export default function AdminPage() {
             } else {
                 alert('Failed to save setting');
             }
-        } catch (e) {
+        } catch {
             alert('Failed to save setting');
         } finally {
             setSettingsLoading(false);
@@ -173,7 +173,7 @@ export default function AdminPage() {
             } else {
                 setBlueprints(prev => [...prev, ...urls]);
             }
-        } catch (e) {
+        } catch {
             alert('Upload failed');
         } finally {
             setLoading(false);

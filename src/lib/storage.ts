@@ -1,5 +1,5 @@
 import { Project } from './data';
-import { supabase, supabaseAdmin, isSupabaseConfigured } from './supabase';
+import { supabaseAdmin, isSupabaseConfigured } from './supabase';
 import { promises as fs } from 'fs';
 import path from 'path';
 
@@ -119,14 +119,7 @@ export async function updateProject(project: Project): Promise<void> {
 }
 
 export async function incrementProjectScan(id: string, device: 'mobile' | 'desktop'): Promise<void> {
-    // We can't do atomic updates easily on a JSONB field inside an array without a stored procedure 
-    // or careful logic. But here 'projects' is a table where one row = one project?
-    // Wait, the storage.ts suggests the 'projects' table has rows. 
-    // Let's check `getProjects`. It selects *. 
-    // If we assume Supabase, we can use an RPC or just read-modify-write for now (less safe but easier).
-    // Better: use an RPC if possible, but I don't have access to create RPCs easily without SQL tool (which I might have, but simple RMW is safer for now).
-
-    // Actually, let's fetch, update in memory, and save back.
+    // Read-modify-write on the scanCount JSON. Not atomic, but scan volume is low enough that it's fine.
     if (useLocal) {
         const existing = await readLocal<Project>('projects.json');
         const target = existing.find(p => p.id === id);
@@ -172,24 +165,6 @@ export async function getRealtors(): Promise<any[]> {
         return [];
     }
     return data || [];
-}
-
-export async function saveRealtors(realtors: any[]): Promise<void> {
-    if (useLocal) {
-        const existing = await readLocal<any>('realtors.json');
-        const byId = new Map(existing.map(r => [r.id, r]));
-        realtors.forEach(r => byId.set(r.id, { ...byId.get(r.id), ...r }));
-        return writeLocal('realtors.json', [...byId.values()]);
-    }
-
-    const { error } = await db
-        .from('realtors')
-        .upsert(realtors);
-
-    if (error) {
-        console.error('Error saving realtors:', error);
-        throw error;
-    }
 }
 
 export async function addRealtor(realtor: any): Promise<void> {

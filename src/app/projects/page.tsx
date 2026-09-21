@@ -1,5 +1,4 @@
 import ProjectGallery from '@/components/ProjectGallery';
-import ContactCard from '@/components/ContactCard';
 import Link from 'next/link';
 import { getProjects } from "@/lib/storage";
 

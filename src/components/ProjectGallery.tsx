@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { Project } from '@/lib/data';
 import { getNextOpenHouse } from '@/lib/openHouse';
@@ -41,7 +40,6 @@ function ProjectItem({ project, index }: { project: Project; index: number }) {
 
     return (
         <article className="relative group/card">
-            {/* ... keeping previous logic ... */}
             {index > 0 && (
                 <div className="absolute -top-[80px] left-1/2 w-px h-[80px] bg-blueprint-line border-l border-dashed border-white/20" />
             )}
@@ -54,9 +52,7 @@ function ProjectItem({ project, index }: { project: Project; index: number }) {
 
                 <div className="flex flex-col-reverse md:grid lg:grid-cols-[40%_60%] gap-0 bg-blueprint">
                     {/* Content Left (Bottom on Mobile) */}
-                    <div className="p-6 md:p-10 flex flex-col justify-between border-t md:border-t-0 md:border-r border-blueprint-line/50 cursor-pointer"
-                        onClick={() => { }}
-                    >
+                    <div className="p-6 md:p-10 flex flex-col justify-between border-t md:border-t-0 md:border-r border-blueprint-line/50 cursor-pointer">
                         <Link href={`/projects/${project.id}`} className="block h-full flex flex-col justify-between">
                             <div className="space-y-6 relative">
                                 {project.status !== 'available' && (
