@@ -43,9 +43,9 @@ function OpenHouseBannerItem({ project, index }: { project: OpenHouseProject; in
                                 title="Add this open house to your calendar"
                                 className="block group cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-blueprint-accent"
                             >
-                                <div className="relative border border-blueprint-accent/60 bg-gradient-to-r from-blueprint-accent/10 via-blueprint/60 to-blueprint-accent/10 backdrop-blur-lg p-5 md:p-6 overflow-hidden hover:border-blueprint-accent transition-all duration-300">
-                                    {/* Animated shimmer effect */}
-                                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-blueprint-accent/5 to-transparent animate-[shimmer_3s_ease-in-out_infinite] pointer-events-none" />
+                                <div className="relative border border-blueprint-accent/60 bg-gradient-to-r from-blueprint-accent/10 via-blueprint/60 to-blueprint-accent/10 backdrop-blur-lg p-5 md:p-6 overflow-hidden shadow-[0_0_24px_rgba(0,240,255,0.15)] hover:border-blueprint-accent hover:shadow-[0_0_32px_rgba(0,240,255,0.25)] transition-all duration-300">
+                                    {/* Soft static glow (no animation) */}
+                                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-blueprint-accent/5 to-transparent pointer-events-none" />
                                     
                                     {/* Corner accents */}
                                     <div className="absolute top-0 left-0 w-5 h-5 border-t-2 border-l-2 border-blueprint-accent" />
@@ -75,7 +75,7 @@ function OpenHouseBannerItem({ project, index }: { project: OpenHouseProject; in
                                             <div>
                                                 <div className="flex items-center gap-3 mb-1">
                                                     <span className="text-blueprint-accent font-bold uppercase tracking-[0.2em] text-xs md:text-sm">Open House</span>
-                                                    <span className={`text-[10px] md:text-xs font-bold uppercase tracking-widest px-2 py-0.5 border ${isToday ? 'bg-red-500/20 text-red-400 border-red-500/50 animate-pulse' : isTomorrow ? 'bg-amber-500/20 text-amber-400 border-amber-500/50' : 'bg-blueprint-accent/10 text-blueprint-accent border-blueprint-accent/30'}`}>
+                                                    <span className={`text-[10px] md:text-xs font-bold uppercase tracking-widest px-2 py-0.5 border ${isToday ? 'bg-red-500/20 text-red-400 border-red-500/50' : isTomorrow ? 'bg-amber-500/20 text-amber-400 border-amber-500/50' : 'bg-blueprint-accent/10 text-blueprint-accent border-blueprint-accent/30'}`}>
                                                         {urgencyLabel}
                                                     </span>
                                                 </div>

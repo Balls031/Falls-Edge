@@ -99,8 +99,8 @@ export default function ProjectDetailView({ project }: { project: Project }) {
                         title="Add this open house to your calendar"
                         className="relative border-2 border-blueprint-accent bg-gradient-to-r from-blueprint-accent/15 via-blueprint/60 to-blueprint-accent/15 p-6 md:p-8 backdrop-blur-lg overflow-hidden shadow-[0_0_30px_rgba(0,240,255,0.15)] cursor-pointer hover:border-white hover:shadow-[0_0_40px_rgba(0,240,255,0.3)] transition-all duration-300 outline-none focus-visible:ring-2 focus-visible:ring-white"
                     >
-                        {/* Shimmer animation */}
-                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-blueprint-accent/5 to-transparent animate-[shimmer_3s_ease-in-out_infinite] pointer-events-none" />
+                        {/* Soft static glow (no animation) */}
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-blueprint-accent/5 to-transparent pointer-events-none" />
 
                         {/* Corner accents */}
                         <div className="absolute top-0 left-0 w-6 h-6 border-t-[3px] border-l-[3px] border-blueprint-accent" />
@@ -132,7 +132,7 @@ export default function ProjectDetailView({ project }: { project: Project }) {
                                 <div className="min-w-0 flex-1">
                                     <div className="flex flex-wrap items-center gap-2 md:gap-3 mb-1.5 md:mb-2">
                                         <h3 className="text-blueprint-accent font-bold uppercase tracking-[0.15em] md:tracking-[0.2em] text-sm md:text-lg">Open House</h3>
-                                        <span className={`text-[9px] md:text-xs font-bold uppercase tracking-widest px-1.5 md:px-2 py-0.5 border whitespace-nowrap ${isToday ? 'bg-red-500/20 text-red-400 border-red-500/50 animate-pulse' : isTomorrow ? 'bg-amber-500/20 text-amber-400 border-amber-500/50' : 'bg-blueprint-accent/10 text-blueprint-accent border-blueprint-accent/30'}`}>
+                                        <span className={`text-[9px] md:text-xs font-bold uppercase tracking-widest px-1.5 md:px-2 py-0.5 border whitespace-nowrap ${isToday ? 'bg-red-500/20 text-red-400 border-red-500/50' : isTomorrow ? 'bg-amber-500/20 text-amber-400 border-amber-500/50' : 'bg-blueprint-accent/10 text-blueprint-accent border-blueprint-accent/30'}`}>
                                             {urgencyLabel}
                                         </span>
                                     </div>

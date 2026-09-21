@@ -211,9 +211,6 @@ export default function AddToCalendarButton({ event, size = 'sm', open, onOpenCh
                 title="Add to Calendar"
                 className="relative cursor-pointer group/cal shrink-0"
             >
-                {size === 'sm' && (
-                    <div className="absolute inset-0 bg-blueprint-accent/30 rounded-full animate-ping" />
-                )}
                 <div className={`relative bg-blueprint-accent text-black ${padding} rounded-full group-hover/cal:bg-white group-hover/cal:scale-110 transition-all duration-200`}>
                     {size === 'lg' ? (
                         <>
