@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { Project, Realtor } from '@/lib/data';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
@@ -8,12 +8,12 @@ import { Sparkles } from 'lucide-react';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, rectSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
-function SortableItem({ id, url, onRemove, isAi, onToggleAi }: { id: string, url: string, onRemove: () => void, isAi?: boolean, onToggleAi?: () => void }) {
+function SortableItem({ id, url, onRemove, isAi, onToggleAi, isMain, onSetMain }: { id: string, url: string, onRemove: () => void, isAi?: boolean, onToggleAi?: () => void, isMain?: boolean, onSetMain?: () => void }) {
     const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id });
     const style = { transform: CSS.Transform.toString(transform), transition };
 
     return (
-        <div ref={setNodeRef} style={style} {...attributes} {...listeners} className={`relative group aspect-square bg-black/40 border cursor-move ${isAi ? 'border-blueprint-accent' : 'border-blueprint-line'}`}>
+        <div ref={setNodeRef} style={style} {...attributes} {...listeners} className={`relative group aspect-square bg-black/40 border cursor-move ${isMain ? 'border-yellow-400' : isAi ? 'border-blueprint-accent' : 'border-blueprint-line'}`}>
             <img src={url} alt="Gallery" className="w-full h-full object-cover" />
             <button
                 type="button"
@@ -32,6 +32,17 @@ function SortableItem({ id, url, onRemove, isAi, onToggleAi }: { id: string, url
                     className={`absolute bottom-1 left-1 flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.5 z-50 cursor-pointer transition-colors ${isAi ? 'bg-blueprint-accent text-black' : 'bg-black/70 text-white/60 hover:text-white'}`}
                 >
                     <Sparkles size={10} /> AI
+                </button>
+            )}
+            {onSetMain && (
+                <button
+                    type="button"
+                    onPointerDown={(e) => e.stopPropagation()}
+                    onClick={(e) => { e.stopPropagation(); e.preventDefault(); if (!isMain) onSetMain(); }}
+                    title={isMain ? 'This is the main photo' : 'Use this photo as the main photo'}
+                    className={`absolute bottom-1 right-1 flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.5 z-50 transition-colors ${isMain ? 'bg-yellow-400 text-black cursor-default' : 'bg-black/70 text-white/60 hover:text-white cursor-pointer'}`}
+                >
+                    ★ {isMain ? 'MAIN' : 'Main'}
                 </button>
             )}
         </div>
@@ -90,6 +101,9 @@ export default function AdminPage() {
 
     const [imageFile, setImageFile] = useState<File | null>(null);
     const [currentImageUrl, setCurrentImageUrl] = useState('');
+    // Local preview of a newly chosen (not yet uploaded) main photo
+    const imagePreview = useMemo(() => (imageFile ? URL.createObjectURL(imageFile) : null), [imageFile]);
+    useEffect(() => () => { if (imagePreview) URL.revokeObjectURL(imagePreview); }, [imagePreview]);
 
     const [gallery, setGallery] = useState<string[]>([]); // URLs
     const [aiImages, setAiImages] = useState<string[]>([]); // gallery URLs flagged as AI renderings
@@ -733,8 +747,22 @@ export default function AdminPage() {
                                     <div className="flex gap-4 mb-6">
                                         <div className="flex-1">
                                             <label className="mb-2 block text-xs text-gray-400">Main Photo</label>
-                                            <input type="file" onChange={e => setImageFile(e.target.files?.[0] || null)} className="w-full text-xs text-gray-500" accept="image/*" />
-                                            {currentImageUrl && <p className="text-[10px] text-green-500 mt-1">Current: Saved</p>}
+                                            <div className="flex gap-4 items-start">
+                                                <div className="w-32 aspect-[4/3] bg-black/40 border border-blueprint-line flex items-center justify-center overflow-hidden shrink-0">
+                                                    {imagePreview || currentImageUrl
+                                                        ? <img src={imagePreview || currentImageUrl} alt="Main photo" className="w-full h-full object-cover" />
+                                                        : <span className="text-[10px] text-gray-600 uppercase">No photo</span>}
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <input type="file" onChange={e => setImageFile(e.target.files?.[0] || null)} className="w-full text-xs text-gray-500" accept="image/*" />
+                                                    {imagePreview
+                                                        ? <p className="text-[10px] text-yellow-400 mt-1">New photo selected — uploads when you save. <button type="button" onClick={() => setImageFile(null)} className="underline text-gray-400 hover:text-white cursor-pointer">Cancel</button></p>
+                                                        : currentImageUrl
+                                                            ? <p className="text-[10px] text-green-500 mt-1">Current main photo saved</p>
+                                                            : <p className="text-[10px] text-gray-500 mt-1">Required</p>}
+                                                    <p className="text-[10px] text-gray-600 mt-2">Or click <span className="text-yellow-400">★ Main</span> on any gallery photo below to use it as the main photo.</p>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
 
@@ -769,6 +797,8 @@ export default function AdminPage() {
                                                         onRemove={() => setGallery(g => g.filter(u => u !== url))}
                                                         isAi={aiImages.includes(url)}
                                                         onToggleAi={() => setAiImages(a => a.includes(url) ? a.filter(u => u !== url) : [...a, url])}
+                                                        isMain={!imageFile && currentImageUrl === url}
+                                                        onSetMain={() => { setImageFile(null); setCurrentImageUrl(url); }}
                                                     />
                                                 ))}
                                                 <label className="aspect-square border border-dashed border-gray-600 flex items-center justify-center text-gray-500 hover:text-white hover:border-white cursor-pointer transition-colors">
