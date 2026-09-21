@@ -1,8 +1,9 @@
 'use client';
 
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, X, Sparkles } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 type LightboxProps = {
     images: string[];
@@ -51,14 +52,19 @@ export default function Lightbox({ images, aiImages = [], initialIndex, isOpen, 
         return () => window.removeEventListener('keydown', handleKey);
     }, [isOpen, onClose, onNext, onPrev]);
 
-    if (!isOpen) return null;
+    if (!isOpen || typeof document === 'undefined') return null;
 
-    return (
-        <AnimatePresence>
-            <motion.div
-                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+    // Rendered through a portal to <body>: the page content sits inside a z-10 wrapper in the layout, so
+    // without this the fixed site header (z-50, outside that wrapper) is drawn on top of the lightbox.
+    return createPortal(
+        <>
+            {/* Overlay is NOT opacity-animated: fading a backdrop-blur layer in from 0 makes browsers
+                paint the un-blurred page for a frame or two ("flash behind the blur"). It appears at
+                full opacity instantly; the image below still fades/scales in. transform-gpu keeps it
+                on its own compositing layer so the blur is ready on the first frame. */}
+            <div
                 onClick={onClose}
-                className="fixed inset-0 z-[100] bg-blueprint/95 backdrop-blur-xl flex items-center justify-center bg-[size:40px_40px] bg-center cursor-zoom-out"
+                className="fixed inset-0 z-[100] bg-blueprint/95 backdrop-blur-xl transform-gpu flex items-center justify-center bg-[size:40px_40px] bg-center cursor-zoom-out"
                 style={{
                     backgroundImage: `linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
                                     linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px)`
@@ -68,7 +74,7 @@ export default function Lightbox({ images, aiImages = [], initialIndex, isOpen, 
                 onTouchEnd={onTouchEnd}
             >
                 {/* Close Button */}
-                <button onClick={onClose} className="absolute top-24 right-6 text-white hover:text-blueprint-accent bg-black/20 hover:bg-black/40 border border-white/10 p-2 z-20 transition-all rounded-sm backdrop-blur-sm">
+                <button onClick={onClose} className="absolute top-6 right-6 text-white hover:text-blueprint-accent bg-black/20 hover:bg-black/40 border border-white/10 p-2 z-20 transition-all rounded-sm backdrop-blur-sm">
                     <X size={32} />
                 </button>
 
@@ -108,7 +114,8 @@ export default function Lightbox({ images, aiImages = [], initialIndex, isOpen, 
                     </div>
                 </motion.div>
 
-            </motion.div>
-        </AnimatePresence>
+            </div>
+        </>,
+        document.body
     )
 }
