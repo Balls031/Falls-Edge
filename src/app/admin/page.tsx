@@ -8,6 +8,22 @@ import { Sparkles } from 'lucide-react';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, rectSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
+// Keep the admin signed in across refreshes. Stored in the browser only; expires after 30 days or on Logout.
+const AUTH_KEY = 'fe_admin_auth';
+const AUTH_TTL_MS = 30 * 24 * 60 * 60 * 1000;
+function readPersistedAuth(): boolean {
+    try {
+        const until = Number(localStorage.getItem(AUTH_KEY));
+        return Number.isFinite(until) && until > Date.now();
+    } catch { return false; }
+}
+function writePersistedAuth(signedIn: boolean) {
+    try {
+        if (signedIn) localStorage.setItem(AUTH_KEY, String(Date.now() + AUTH_TTL_MS));
+        else localStorage.removeItem(AUTH_KEY);
+    } catch { /* storage unavailable (private mode etc.) — session just won't persist */ }
+}
+
 function SortableItem({ id, url, onRemove, isAi, onToggleAi, isMain, onSetMain }: { id: string, url: string, onRemove: () => void, isAi?: boolean, onToggleAi?: () => void, isMain?: boolean, onSetMain?: () => void }) {
     const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id });
     const style = { transform: CSS.Transform.toString(transform), transition };
@@ -115,6 +131,11 @@ export default function AdminPage() {
         useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
     );
 
+    // Restore a persisted sign-in after a refresh
+    useEffect(() => {
+        if (readPersistedAuth()) setAuth(true);
+    }, []);
+
     useEffect(() => {
         if (auth) {
             fetchProjects();
@@ -163,7 +184,7 @@ export default function AdminPage() {
 
     const handleLogin = (e: React.FormEvent) => {
         e.preventDefault();
-        if (pass === 'Xn^xn4Y**d2Jq1YkkDfQDfNbG') setAuth(true);
+        if (pass === 'Xn^xn4Y**d2Jq1YkkDfQDfNbG') { setAuth(true); writePersistedAuth(true); }
         else alert('Access Denied');
     };
 
@@ -486,7 +507,7 @@ export default function AdminPage() {
                         <button onClick={() => setActiveTab('realtors')} className={`px-6 py-2 text-xs uppercase tracking-widest transition-colors ${activeTab === 'realtors' ? 'bg-blueprint-accent text-black font-bold' : 'text-gray-400 hover:text-white'}`}>Realtors</button>
                         <button onClick={() => setActiveTab('settings')} className={`px-6 py-2 text-xs uppercase tracking-widest transition-colors ${activeTab === 'settings' ? 'bg-blueprint-accent text-black font-bold' : 'text-gray-400 hover:text-white'}`}>Settings</button>
                     </div>
-                    <button onClick={() => setAuth(false)} className='px-4 py-2 border border-red-900/50 text-red-400 text-xs uppercase hover:bg-red-900/20 transition-colors'>Logout</button>
+                    <button onClick={() => { setAuth(false); writePersistedAuth(false); }} className='px-4 py-2 border border-red-900/50 text-red-400 text-xs uppercase hover:bg-red-900/20 transition-colors'>Logout</button>
                 </div>
             </header>
 
