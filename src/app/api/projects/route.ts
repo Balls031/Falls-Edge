@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { isAdminRequest, unauthorized } from '@/lib/adminAuth';
 import { getProjects, addProject, deleteProject, updateProject } from '@/lib/storage';
 import { Project } from '@/lib/data';
 
@@ -8,6 +9,7 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+    if (!isAdminRequest(request)) return unauthorized();
     try {
         const body = await request.json();
         // Basic validation
@@ -24,6 +26,7 @@ export async function POST(request: Request) {
 }
 
 export async function PUT(request: Request) {
+    if (!isAdminRequest(request)) return unauthorized();
     try {
         const body = await request.json();
         if (!body.title || !body.id) {
@@ -39,6 +42,7 @@ export async function PUT(request: Request) {
 }
 
 export async function DELETE(request: Request) {
+    if (!isAdminRequest(request)) return unauthorized();
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
 

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { isAdminRequest, unauthorized } from '@/lib/adminAuth';
 import { getSiteSettings, updateSiteSetting } from '@/lib/settings';
 
 export async function GET() {
@@ -7,6 +8,7 @@ export async function GET() {
 }
 
 export async function PUT(request: Request) {
+    if (!isAdminRequest(request)) return unauthorized();
     try {
         const body = await request.json();
         const { key, value } = body;

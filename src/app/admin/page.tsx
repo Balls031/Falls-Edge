@@ -8,20 +8,12 @@ import { Sparkles } from 'lucide-react';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, rectSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
-// Keep the admin signed in across refreshes. Stored in the browser only; expires after 30 days or on Logout.
-const AUTH_KEY = 'fe_admin_auth';
-const AUTH_TTL_MS = 30 * 24 * 60 * 60 * 1000;
-function readPersistedAuth(): boolean {
-    try {
-        const until = Number(localStorage.getItem(AUTH_KEY));
-        return Number.isFinite(until) && until > Date.now();
-    } catch { return false; }
-}
-function writePersistedAuth(signedIn: boolean) {
-    try {
-        if (signedIn) localStorage.setItem(AUTH_KEY, String(Date.now() + AUTH_TTL_MS));
-        else localStorage.removeItem(AUTH_KEY);
-    } catch { /* storage unavailable (private mode etc.) — session just won't persist */ }
+// Like fetch, but announces a 401 so the admin page can return to the login screen.
+const SESSION_EXPIRED_EVENT = 'fe-admin-session-expired';
+async function adminFetch(input: RequestInfo | URL, init?: RequestInit) {
+    const res = await fetch(input, init);
+    if (res.status === 401) window.dispatchEvent(new Event(SESSION_EXPIRED_EVENT));
+    return res;
 }
 
 function SortableItem({ id, url, onRemove, isAi, onToggleAi, isMain, onSetMain }: { id: string, url: string, onRemove: () => void, isAi?: boolean, onToggleAi?: () => void, isMain?: boolean, onSetMain?: () => void }) {
@@ -68,6 +60,13 @@ function SortableItem({ id, url, onRemove, isAi, onToggleAi, isMain, onSetMain }
 export default function AdminPage() {
     const [auth, setAuth] = useState(false);
     const [pass, setPass] = useState('');
+
+    // Drop back to the login screen when an API call reports the session is gone
+    useEffect(() => {
+        const onExpired = () => { setAuth(false); alert('Your session has expired — please sign in again.'); };
+        window.addEventListener(SESSION_EXPIRED_EVENT, onExpired);
+        return () => window.removeEventListener(SESSION_EXPIRED_EVENT, onExpired);
+    }, []);
     const [projects, setProjects] = useState<Project[]>([]);
 
     // Form State
@@ -131,9 +130,12 @@ export default function AdminPage() {
         useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
     );
 
-    // Restore a persisted sign-in after a refresh
+    // Restore the session (HttpOnly cookie) after a refresh
     useEffect(() => {
-        if (readPersistedAuth()) setAuth(true);
+        fetch('/api/auth/me')
+            .then(r => r.json())
+            .then(d => { if (d.authed) setAuth(true); })
+            .catch(() => { });
     }, []);
 
     useEffect(() => {
@@ -146,7 +148,7 @@ export default function AdminPage() {
 
     const fetchSettings = async () => {
         try {
-            const res = await fetch('/api/settings');
+            const res = await adminFetch('/api/settings');
             const data = await res.json();
             setHideOurHomesPage(data.hideOurHomesPage === true);
         } catch (e) {
@@ -158,7 +160,7 @@ export default function AdminPage() {
         setSettingsLoading(true);
         setSettingsSaved(false);
         try {
-            const res = await fetch('/api/settings', {
+            const res = await adminFetch('/api/settings', {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ key, value: String(value) })
@@ -177,21 +179,31 @@ export default function AdminPage() {
     };
 
     const fetchProjects = async () => {
-        const res = await fetch('/api/projects');
+        const res = await adminFetch('/api/projects');
         const data = await res.json();
         setProjects(data);
     };
 
-    const handleLogin = (e: React.FormEvent) => {
+    const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (pass === 'Xn^xn4Y**d2Jq1YkkDfQDfNbG') { setAuth(true); writePersistedAuth(true); }
-        else alert('Access Denied');
+        try {
+            const res = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password: pass }),
+            });
+            if (res.ok) { setAuth(true); setPass(''); return; }
+            const data = await res.json().catch(() => ({}));
+            alert(res.status === 401 ? 'Access Denied' : (data.error || 'Login failed'));
+        } catch {
+            alert('Login failed — could not reach the server.');
+        }
     };
 
     const handleUpload = async (file: File) => {
         const formData = new FormData();
         formData.append('file', file);
-        const res = await fetch('/api/upload', { method: 'POST', body: formData });
+        const res = await adminFetch('/api/upload', { method: 'POST', body: formData });
         const data = await res.json();
         if (data.success) return data.url;
         throw new Error('Upload failed');
@@ -216,7 +228,7 @@ export default function AdminPage() {
     };
 
     const fetchRealtors = async () => {
-        const res = await fetch('/api/realtors');
+        const res = await adminFetch('/api/realtors');
         const data = await res.json();
         setRealtors(data);
     };
@@ -239,7 +251,7 @@ export default function AdminPage() {
             };
 
             const method = editingRealtorId ? 'PUT' : 'POST';
-            const res = await fetch('/api/realtors', {
+            const res = await adminFetch('/api/realtors', {
                 method,
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(realtorData)
@@ -263,7 +275,7 @@ export default function AdminPage() {
 
     const deleteRealtor = async (id: string) => {
         if (!confirm('Delete this realtor?')) return;
-        await fetch(`/api/realtors?id=${id}`, { method: 'DELETE' });
+        await adminFetch(`/api/realtors?id=${id}`, { method: 'DELETE' });
         fetchRealtors();
     };
 
@@ -413,7 +425,7 @@ export default function AdminPage() {
             };
 
             const method = editingId ? 'PUT' : 'POST';
-            const res = await fetch('/api/projects', {
+            const res = await adminFetch('/api/projects', {
                 method,
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(projectData)
@@ -440,7 +452,7 @@ export default function AdminPage() {
 
     const handleDelete = async (id: string) => {
         if (!confirm('Delete this project?')) return;
-        await fetch(`/api/projects?id=${id}`, { method: 'DELETE' });
+        await adminFetch(`/api/projects?id=${id}`, { method: 'DELETE' });
         fetchProjects();
         if (editingId === id) resetForm();
     };
@@ -462,7 +474,7 @@ export default function AdminPage() {
         if (!project) return;
 
         const updated = { ...project, scanCount: { mobile: 0, desktop: 0 } };
-        await fetch('/api/projects', {
+        await adminFetch('/api/projects', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(updated)
@@ -507,7 +519,7 @@ export default function AdminPage() {
                         <button onClick={() => setActiveTab('realtors')} className={`px-6 py-2 text-xs uppercase tracking-widest transition-colors ${activeTab === 'realtors' ? 'bg-blueprint-accent text-black font-bold' : 'text-gray-400 hover:text-white'}`}>Realtors</button>
                         <button onClick={() => setActiveTab('settings')} className={`px-6 py-2 text-xs uppercase tracking-widest transition-colors ${activeTab === 'settings' ? 'bg-blueprint-accent text-black font-bold' : 'text-gray-400 hover:text-white'}`}>Settings</button>
                     </div>
-                    <button onClick={() => { setAuth(false); writePersistedAuth(false); }} className='px-4 py-2 border border-red-900/50 text-red-400 text-xs uppercase hover:bg-red-900/20 transition-colors'>Logout</button>
+                    <button onClick={async () => { await fetch('/api/auth/logout', { method: 'POST' }).catch(() => { }); setAuth(false); }} className='px-4 py-2 border border-red-900/50 text-red-400 text-xs uppercase hover:bg-red-900/20 transition-colors'>Logout</button>
                 </div>
             </header>
 
