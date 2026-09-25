@@ -4,7 +4,7 @@ import sharp from 'sharp';
 import { supabaseAdmin } from '@/lib/supabase';
 
 export async function POST(request: Request) {
-    if (!isAdminRequest(request)) return unauthorized();
+    if (!(await isAdminRequest(request))) return unauthorized();
     const data = await request.formData();
     const file: File | null = data.get('file') as unknown as File;
 

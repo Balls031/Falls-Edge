@@ -4,5 +4,5 @@ import { isAdminRequest } from '@/lib/adminAuth';
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
-    return NextResponse.json({ authed: isAdminRequest(request) });
+    return NextResponse.json({ authed: await isAdminRequest(request) });
 }

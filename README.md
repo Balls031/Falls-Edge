@@ -24,8 +24,12 @@ SUPABASE_SERVICE_ROLE_KEY=...
 ADMIN_PASSWORD=choose-a-strong-key
 ```
 
-`ADMIN_PASSWORD` is the key for `/admin`. It is checked on the server only; a successful login sets a
+`ADMIN_PASSWORD` is the initial key for `/admin`. It is checked on the server only; a successful login sets a
 signed HttpOnly cookie (30 days) and every API route that writes data requires it.
+
+The password can be changed from **Admin → Settings → Security**. Once changed, it is stored as a scrypt hash
+in the `site_settings` table (key `adminPasswordHash`) and `ADMIN_PASSWORD` is no longer used. To recover from a
+forgotten password, delete that row in Supabase and the env var applies again.
 
 If these are not set, the site falls back to the local JSON files in `data/` so it can be run without a database.
 

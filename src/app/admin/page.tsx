@@ -105,6 +105,39 @@ export default function AdminPage() {
     const [settingsLoading, setSettingsLoading] = useState(false);
     const [settingsSaved, setSettingsSaved] = useState(false);
 
+    // Change admin password
+    const [pwCurrent, setPwCurrent] = useState('');
+    const [pwNew, setPwNew] = useState('');
+    const [pwConfirm, setPwConfirm] = useState('');
+    const [pwSaving, setPwSaving] = useState(false);
+    const [pwMessage, setPwMessage] = useState<{ ok: boolean; text: string } | null>(null);
+
+    const handleChangePassword = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setPwMessage(null);
+        if (pwNew !== pwConfirm) { setPwMessage({ ok: false, text: 'New passwords do not match.' }); return; }
+        if (pwNew.length < 8) { setPwMessage({ ok: false, text: 'New password must be at least 8 characters.' }); return; }
+        setPwSaving(true);
+        try {
+            const res = await adminFetch('/api/auth/password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ currentPassword: pwCurrent, newPassword: pwNew }),
+            });
+            const data = await res.json().catch(() => ({}));
+            if (res.ok) {
+                setPwCurrent(''); setPwNew(''); setPwConfirm('');
+                setPwMessage({ ok: true, text: 'Password updated. Any other signed-in sessions have been logged out.' });
+            } else {
+                setPwMessage({ ok: false, text: data.error || 'Could not change password.' });
+            }
+        } catch {
+            setPwMessage({ ok: false, text: 'Could not reach the server.' });
+        } finally {
+            setPwSaving(false);
+        }
+    };
+
     // Realtor Form
     const [editingRealtorId, setEditingRealtorId] = useState<string | null>(null);
     const [rName, setRName] = useState('');
@@ -555,6 +588,39 @@ export default function AdminPage() {
                                         </div>
                                     </label>
                                 </div>
+                            </div>
+
+                            {/* Security */}
+                            <div>
+                                <h3 className="text-white font-bold uppercase tracking-widest font-mono text-sm mb-4 border-b border-blueprint-line pb-2">Security</h3>
+                                <form onSubmit={handleChangePassword} className="p-4 bg-black/20 border border-blueprint-line space-y-3">
+                                    <div>
+                                        <span className="text-white font-mono text-sm block">Change Admin Password</span>
+                                        <span className="text-gray-500 text-xs mt-1 block">The password is stored only as a hash. Changing it signs out every other device.</span>
+                                    </div>
+                                    <div>
+                                        <label htmlFor="pwCurrent" className="block text-[10px] uppercase text-gray-500 mb-1">Current Password</label>
+                                        <input id="pwCurrent" type="password" autoComplete="current-password" value={pwCurrent} onChange={e => setPwCurrent(e.target.value)} required className="w-full bg-black/40 border border-blueprint-line p-3 text-white font-mono text-sm focus:border-blueprint-accent outline-none" />
+                                    </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                        <div>
+                                            <label htmlFor="pwNew" className="block text-[10px] uppercase text-gray-500 mb-1">New Password <span className="text-gray-600 normal-case">(8+ characters)</span></label>
+                                            <input id="pwNew" type="password" autoComplete="new-password" value={pwNew} onChange={e => setPwNew(e.target.value)} required minLength={8} className="w-full bg-black/40 border border-blueprint-line p-3 text-white font-mono text-sm focus:border-blueprint-accent outline-none" />
+                                        </div>
+                                        <div>
+                                            <label htmlFor="pwConfirm" className="block text-[10px] uppercase text-gray-500 mb-1">Confirm New Password</label>
+                                            <input id="pwConfirm" type="password" autoComplete="new-password" value={pwConfirm} onChange={e => setPwConfirm(e.target.value)} required minLength={8} className="w-full bg-black/40 border border-blueprint-line p-3 text-white font-mono text-sm focus:border-blueprint-accent outline-none" />
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-4">
+                                        <button type="submit" disabled={pwSaving} className="px-4 py-2 bg-blueprint-accent text-black text-xs uppercase tracking-widest font-bold hover:bg-white transition-colors disabled:opacity-50 cursor-pointer">
+                                            {pwSaving ? 'Saving...' : 'Update Password'}
+                                        </button>
+                                        {pwMessage && (
+                                            <span className={`text-xs font-mono ${pwMessage.ok ? 'text-green-400' : 'text-red-400'}`}>{pwMessage.ok ? '✓ ' : ''}{pwMessage.text}</span>
+                                        )}
+                                    </div>
+                                </form>
                             </div>
 
                             {/* Save Indicator */}

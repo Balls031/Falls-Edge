@@ -9,7 +9,7 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-    if (!isAdminRequest(request)) return unauthorized();
+    if (!(await isAdminRequest(request))) return unauthorized();
     try {
         const body = await request.json();
         if (!body.name || !body.id) {
@@ -25,7 +25,7 @@ export async function POST(request: Request) {
 }
 
 export async function PUT(request: Request) {
-    if (!isAdminRequest(request)) return unauthorized();
+    if (!(await isAdminRequest(request))) return unauthorized();
     try {
         const body = await request.json();
         if (!body.name || !body.id) {
@@ -50,7 +50,7 @@ export async function PUT(request: Request) {
 }
 
 export async function DELETE(request: Request) {
-    if (!isAdminRequest(request)) return unauthorized();
+    if (!(await isAdminRequest(request))) return unauthorized();
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
 
