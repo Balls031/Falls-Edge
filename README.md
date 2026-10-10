@@ -22,6 +22,7 @@ NEXT_PUBLIC_SUPABASE_URL=https://xxxx.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=...
 SUPABASE_SERVICE_ROLE_KEY=...
 ADMIN_PASSWORD=choose-a-strong-key
+DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/...   # optional: sign-scan alerts
 ```
 
 `ADMIN_PASSWORD` is the initial key for `/admin`. It is checked on the server only; a successful login sets a
@@ -36,3 +37,10 @@ If these are not set, the site falls back to the local JSON files in `data/` so 
 ## Deploy
 
 Deployed on [Vercel](https://vercel.com). Set the same environment variables under the project's Settings → Environment Variables.
+
+## Sign scan notifications
+
+Each sign QR code points at `/<sign id>` (set per listing in the admin). Scans are counted and, if
+`DISCORD_WEBHOOK_URL` is set, a message is posted to Discord with the home, device type, running totals and
+approximate location. Create the webhook in Discord (Server Settings → Integrations → Webhooks), add the URL
+in Vercel, redeploy, then use **Admin → Settings → Notifications → Send Test Message** to confirm.

@@ -105,6 +105,25 @@ export default function AdminPage() {
     const [settingsLoading, setSettingsLoading] = useState(false);
     const [settingsSaved, setSettingsSaved] = useState(false);
 
+    // Discord notifications
+    const [notifyConfigured, setNotifyConfigured] = useState<boolean | null>(null);
+    const [notifySending, setNotifySending] = useState(false);
+    const [notifyMessage, setNotifyMessage] = useState<{ ok: boolean; text: string } | null>(null);
+
+    const sendTestNotification = async () => {
+        setNotifySending(true);
+        setNotifyMessage(null);
+        try {
+            const res = await adminFetch('/api/notify/test', { method: 'POST' });
+            const data = await res.json().catch(() => ({}));
+            setNotifyMessage(res.ok ? { ok: true, text: 'Test message sent — check Discord.' } : { ok: false, text: data.error || 'Could not send.' });
+        } catch {
+            setNotifyMessage({ ok: false, text: 'Could not reach the server.' });
+        } finally {
+            setNotifySending(false);
+        }
+    };
+
     // Change admin password
     const [pwCurrent, setPwCurrent] = useState('');
     const [pwNew, setPwNew] = useState('');
@@ -180,6 +199,7 @@ export default function AdminPage() {
     }, [auth]);
 
     const fetchSettings = async () => {
+        adminFetch('/api/notify/test').then(r => r.json()).then(d => setNotifyConfigured(d.configured === true)).catch(() => setNotifyConfigured(null));
         try {
             const res = await adminFetch('/api/settings');
             const data = await res.json();
@@ -587,6 +607,36 @@ export default function AdminPage() {
                                             <div className="absolute left-[2px] top-[2px] w-5 h-5 bg-gray-400 peer-checked:bg-blueprint-accent rounded-full transition-all peer-checked:translate-x-5" />
                                         </div>
                                     </label>
+                                </div>
+                            </div>
+
+                            {/* Notifications */}
+                            <div>
+                                <h3 className="text-white font-bold uppercase tracking-widest font-mono text-sm mb-4 border-b border-blueprint-line pb-2">Notifications</h3>
+                                <div className="p-4 bg-black/20 border border-blueprint-line space-y-3">
+                                    <div className="flex items-start justify-between gap-4">
+                                        <div>
+                                            <span className="text-white font-mono text-sm block">Sign Scan Alerts (Discord)</span>
+                                            <span className="text-gray-500 text-xs mt-1 block">A Discord message each time someone scans a sign QR code — which home, phone or desktop, running totals, and approximate location.</span>
+                                        </div>
+                                        <span className={`shrink-0 text-[10px] uppercase tracking-widest px-2 py-0.5 border ${notifyConfigured ? 'text-green-400 border-green-500/50 bg-green-500/10' : 'text-gray-500 border-gray-700'}`}>
+                                            {notifyConfigured === null ? '…' : notifyConfigured ? 'Connected' : 'Not set up'}
+                                        </span>
+                                    </div>
+                                    {!notifyConfigured && (
+                                        <p className="text-[10px] text-gray-500 leading-relaxed">
+                                            Setup: in Discord open <span className="text-gray-400">Server Settings → Integrations → Webhooks → New Webhook</span>, choose the channel and copy the webhook URL.
+                                            Then add it in Vercel as the <span className="text-blueprint-accent">DISCORD_WEBHOOK_URL</span> environment variable and redeploy.
+                                        </p>
+                                    )}
+                                    <div className="flex items-center gap-4">
+                                        <button type="button" onClick={sendTestNotification} disabled={notifySending || !notifyConfigured} className="px-4 py-2 border border-blueprint-accent text-blueprint-accent text-xs uppercase tracking-widest font-bold hover:bg-blueprint-accent hover:text-black transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer">
+                                            {notifySending ? 'Sending...' : 'Send Test Message'}
+                                        </button>
+                                        {notifyMessage && (
+                                            <span className={`text-xs font-mono ${notifyMessage.ok ? 'text-green-400' : 'text-red-400'}`}>{notifyMessage.ok ? '✓ ' : ''}{notifyMessage.text}</span>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
 

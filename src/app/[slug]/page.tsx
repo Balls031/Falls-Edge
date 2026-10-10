@@ -1,6 +1,8 @@
 import { getProjects, incrementProjectScan } from '@/lib/storage';
+import { notifyScan } from '@/lib/notify';
 import { notFound, redirect } from 'next/navigation';
 import { headers } from 'next/headers';
+import { after } from 'next/server';
 
 export default async function RedirectPage({ params }: { params: Promise<{ slug: string }> }) {
     const { slug } = await params;
@@ -20,6 +22,16 @@ export default async function RedirectPage({ params }: { params: Promise<{ slug:
 
         // Increment Count (Fire and forget? No, best to await to ensure write)
         await incrementProjectScan(project.id, device);
+
+        // Discord notification — runs after the redirect is sent so it never slows the visitor down.
+        const counts = project.scanCount || { mobile: 0, desktop: 0 };
+        const updatedProject = { ...project, scanCount: { ...counts, [device]: (counts[device] || 0) + 1 } };
+        const proto = headersList.get('x-forwarded-proto') || 'https';
+        const host = headersList.get('x-forwarded-host') || headersList.get('host') || 'fallsedge.build';
+        const siteUrl = `${proto}://${host}`;
+        const location = [headersList.get('x-vercel-ip-city'), headersList.get('x-vercel-ip-country-region'), headersList.get('x-vercel-ip-country')]
+            .filter(Boolean).map(v => decodeURIComponent(v as string)).join(', ') || undefined;
+        after(() => notifyScan({ project: updatedProject, sign: slug, device, siteUrl, location }));
 
         redirect(`/projects/${project.id}`);
     }
