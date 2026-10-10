@@ -109,6 +109,27 @@ export default function AdminPage() {
     const [notifyConfigured, setNotifyConfigured] = useState<boolean | null>(null);
     const [notifySending, setNotifySending] = useState(false);
     const [notifyMessage, setNotifyMessage] = useState<{ ok: boolean; text: string } | null>(null);
+    const [mentionUserId, setMentionUserId] = useState('');
+    const [mentionSaving, setMentionSaving] = useState(false);
+    const [mentionMessage, setMentionMessage] = useState<{ ok: boolean; text: string } | null>(null);
+
+    const saveMentionUserId = async () => {
+        setMentionSaving(true);
+        setMentionMessage(null);
+        try {
+            const res = await adminFetch('/api/settings', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ key: 'discordMentionUserId', value: mentionUserId.trim() }),
+            });
+            const data = await res.json().catch(() => ({}));
+            setMentionMessage(res.ok ? { ok: true, text: mentionUserId.trim() ? 'Saved — these users will be @mentioned.' : 'Saved — mentions off.' } : { ok: false, text: data.error || 'Could not save.' });
+        } catch {
+            setMentionMessage({ ok: false, text: 'Could not reach the server.' });
+        } finally {
+            setMentionSaving(false);
+        }
+    };
 
     const sendTestNotification = async () => {
         setNotifySending(true);
@@ -199,7 +220,7 @@ export default function AdminPage() {
     }, [auth]);
 
     const fetchSettings = async () => {
-        adminFetch('/api/notify/test').then(r => r.json()).then(d => setNotifyConfigured(d.configured === true)).catch(() => setNotifyConfigured(null));
+        adminFetch('/api/notify/test').then(r => r.json()).then(d => { setNotifyConfigured(d.configured === true); setMentionUserId(d.mentionUserId || ''); }).catch(() => setNotifyConfigured(null));
         try {
             const res = await adminFetch('/api/settings');
             const data = await res.json();
@@ -629,6 +650,14 @@ export default function AdminPage() {
                                             Then add it in Vercel as the <span className="text-blueprint-accent">DISCORD_WEBHOOK_URL</span> environment variable and redeploy.
                                         </p>
                                     )}
+                                    <div>
+                                        <label htmlFor="mentionUserId" className="block text-[10px] uppercase text-gray-500 mb-1">Mention <span className="text-gray-600 normal-case">(Discord user IDs, comma-separated — optional)</span></label>
+                                        <div className="flex gap-2">
+                                            <input id="mentionUserId" inputMode="numeric" value={mentionUserId} onChange={e => setMentionUserId(e.target.value)} placeholder="e.g. 236987563246747651, 218541321588047872" className="flex-1 bg-black/40 border border-blueprint-line p-3 text-white font-mono text-sm focus:border-blueprint-accent outline-none" />
+                                            <button type="button" onClick={saveMentionUserId} disabled={mentionSaving} className="px-4 py-2 bg-blueprint-accent text-black text-xs uppercase tracking-widest font-bold hover:bg-white transition-colors disabled:opacity-50 cursor-pointer">{mentionSaving ? 'Saving...' : 'Save'}</button>
+                                        </div>
+                                        <p className="text-[10px] text-gray-600 mt-1">Each alert will @mention these users. In Discord: Settings → Advanced → Developer Mode, then right-click your name → Copy User ID.{mentionMessage && <span className={`ml-2 font-mono ${mentionMessage.ok ? 'text-green-400' : 'text-red-400'}`}>{mentionMessage.ok ? '✓ ' : ''}{mentionMessage.text}</span>}</p>
+                                    </div>
                                     <div className="flex items-center gap-4">
                                         <button type="button" onClick={sendTestNotification} disabled={notifySending || !notifyConfigured} className="px-4 py-2 border border-blueprint-accent text-blueprint-accent text-xs uppercase tracking-widest font-bold hover:bg-blueprint-accent hover:text-black transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer">
                                             {notifySending ? 'Sending...' : 'Send Test Message'}

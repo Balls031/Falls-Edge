@@ -6,8 +6,26 @@
  * not break the QR redirect.
  */
 import { Project } from './data';
+import { getSettingValue } from './settings';
 
 const ACCENT = 0x00f0ff;
+export const MENTION_SETTING_KEY = 'discordMentionUserId';
+export const isValidDiscordUserId = (v: unknown): v is string => typeof v === 'string' && /^\d{17,20}$/.test(v);
+
+/** "id, id id" → ["id", "id"]. Returns null if any entry isn't a Discord user ID. */
+export function parseMentionIds(value: unknown): string[] | null {
+    if (typeof value !== 'string') return null;
+    const ids = value.split(/[\s,]+/).filter(Boolean);
+    return ids.every(isValidDiscordUserId) ? ids : null;
+}
+
+/** Optional Discord users to @mention (set in Admin → Settings → Notifications). */
+async function mentionFields(): Promise<{ content?: string; allowed_mentions: { parse: string[]; users?: string[] } }> {
+    const ids = parseMentionIds((await getSettingValue(MENTION_SETTING_KEY)) || '') || [];
+    return ids.length
+        ? { content: ids.map(id => `<@${id}>`).join(' '), allowed_mentions: { parse: [], users: ids } }
+        : { allowed_mentions: { parse: [] } };
+}
 
 export function isNotifyConfigured(): boolean {
     return !!process.env.DISCORD_WEBHOOK_URL;
@@ -50,6 +68,7 @@ export async function notifyScan({ project, sign, device, siteUrl, location }: S
 
     return postToDiscord({
         username: 'Falls Edge Signs',
+        ...(await mentionFields()),
         embeds: [{
             title: `📍 Sign scanned — ${project.title}`,
             url: `${siteUrl}/projects/${project.id}`,
@@ -64,6 +83,7 @@ export async function notifyScan({ project, sign, device, siteUrl, location }: S
 export async function notifyTest(siteUrl: string): Promise<boolean> {
     return postToDiscord({
         username: 'Falls Edge Signs',
+        ...(await mentionFields()),
         embeds: [{
             title: '✅ Test notification',
             description: 'Sign-scan notifications are working. You will get a message here each time a sign QR code is scanned.',

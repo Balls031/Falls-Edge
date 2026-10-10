@@ -1,13 +1,14 @@
 import { NextResponse } from 'next/server';
 import { isAdminRequest, unauthorized } from '@/lib/adminAuth';
-import { isNotifyConfigured, notifyTest } from '@/lib/notify';
+import { isNotifyConfigured, notifyTest, MENTION_SETTING_KEY } from '@/lib/notify';
+import { getSettingValue } from '@/lib/settings';
 
 export const dynamic = 'force-dynamic';
 
 /** Is a Discord webhook configured? (admin only) */
 export async function GET(request: Request) {
     if (!(await isAdminRequest(request))) return unauthorized();
-    return NextResponse.json({ configured: isNotifyConfigured() });
+    return NextResponse.json({ configured: isNotifyConfigured(), mentionUserId: (await getSettingValue(MENTION_SETTING_KEY)) || '' });
 }
 
 /** Send a test message to the configured webhook (admin only). */
